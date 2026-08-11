@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ድርኛ — መጫወቻ (Direnya Playground)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<style>
+  :root{
+    --primary:#1E3A8A; --primary-d:#16296B; --secondary:#F59E0B; --secondary-d:#D6870A;
+    --bg:#0F172A; --panel:#111C34; --border:#22335C; --text:#E5EAF8; --muted:#8CA0D0;
+    --success:#16A34A; --error:#F87171; --warn-bg:#241726;
+  }
+  /* ብርሃን ሁነታ — light mode. Toggled via .light-mode on <body>; everything else
+     in this file reads colors through the variables above, so this is the
+     only place light mode needs to be defined. */
+  body.light-mode{
+    --bg:#FFFFFF; --panel:#F1F5F9; --border:#E2E8F0; --text:#1E293B; --muted:#64748B;
+    --warn-bg:#FEF2F2;
+  }
+  body.light-mode .cm-tag{color:#0369A1;}
+  body.light-mode .cm-attribute{color:#B91C1C;}
+  body.light-mode .cm-string{color:#15803D;}
+  body.light-mode .cm-number{color:#B45309;}
+  body.light-mode .cm-property{color:#0369A1;}
+  body.light-mode .cm-atom{color:#B45309;}
+  body.light-mode .cm-direnya-keyword{color:#B45309;}
+  body.light-mode .cm-direnya-builtin{color:#6D28D9;}
+  body.light-mode .cm-comment{color:var(--muted);}
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:'Noto Sans Ethiopic',sans-serif; background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column;}
+  header{background:var(--panel); border-bottom:1px solid var(--border); padding:10px 16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  header h1{font-size:1rem; margin:0; display:flex; align-items:center; gap:8px;}
+  header h1 .mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;}
+  header .spacer{flex:1;}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:8px; padding:8px 16px; font-weight:600; font-size:.85rem;}
+  .btn-run{background:var(--secondary); color:#fff;}
+  .btn-run:hover{background:var(--secondary-d);}
+  .btn-dl{background:transparent; color:var(--text); border:1px solid var(--border);}
+  .btn-dl:hover{border-color:var(--secondary);}
+  .btn-theme{background:transparent; color:var(--text); border:1px solid var(--border); padding:8px 12px;}
+  .btn-theme:hover{border-color:var(--secondary);}
+  main{flex:1; display:flex; min-height:0;}
+  .editor-pane{width:46%; display:flex; flex-direction:column; border-right:1px solid var(--border); min-width:320px;}
+  .tabs{display:flex; background:var(--panel); border-bottom:1px solid var(--border);}
+  .tab{padding:10px 16px; font-size:.85rem; font-weight:600; color:var(--muted); border-bottom:2px solid transparent; cursor:pointer;}
+  .tab.active{color:var(--secondary); border-bottom-color:var(--secondary);}
+  .tab-content{flex:1; display:none; min-height:0;}
+  .tab-content.active{display:flex;}
+  textarea{
+    flex:1; width:100%; background:var(--bg); color:var(--text); border:none; resize:none;
+    font-family:'Fira Code', monospace; font-size:14px; line-height:1.6; padding:14px; outline:none;
+  }
+  /* CodeMirror: match the playground's own dark theme instead of pulling in a separate theme file */
+  .CodeMirror{
+    height:100%; background:var(--bg); color:var(--text);
+    font-family:'Fira Code', monospace; font-size:14px; line-height:1.6;
+  }
+  .CodeMirror-gutters{background:var(--panel); border-right:1px solid var(--border);}
+  .CodeMirror-linenumber{color:var(--muted); opacity:.6;}
+  .CodeMirror-cursor{border-left:1.5px solid var(--secondary);}
+  .CodeMirror-selected{background:rgba(245,158,11,.18) !important;}
+  .cm-tag{color:#7DD3FC;}                 /* HTML tag names (structural — works for any tag name, Amharic included) */
+  .cm-attribute{color:#FCA5A5;}           /* HTML attribute names */
+  .cm-string{color:#86EFAC;}              /* strings, in any of the three languages */
+  .cm-number{color:#FCD34D;}
+  .cm-comment{color:var(--muted); font-style:italic;}
+  .cm-property{color:#7DD3FC;}            /* CSS property names — structural, works for Amharic property names too */
+  .cm-atom{color:#FCD34D;}
+  .cm-direnya-keyword{color:#F59E0B; font-weight:600;}   /* ካሆነ/ጨርስ/ወይም/ድገም/ተግባር/... */
+  .cm-direnya-builtin{color:#C4B5FD; font-weight:600;}   /* ጻፍ/አሳውቅ/አትም */
+  .preview-pane{flex:1; display:flex; flex-direction:column; min-width:280px;}
+  .preview-head{background:var(--panel); border-bottom:1px solid var(--border); padding:8px 14px; font-size:.78rem; color:var(--muted); display:flex; justify-content:space-between; align-items:center;}
+  iframe{flex:1; border:none; background:#fff;}
+  .warnings{background:var(--warn-bg); border-top:1px solid var(--border); max-height:120px; overflow-y:auto; padding:8px 14px; font-size:.78rem; color:var(--error); font-family:'Fira Code',monospace; display:none;}
+  .warnings.show{display:block;}
+  footer{background:var(--panel); border-top:1px solid var(--border); padding:8px 16px; font-size:.72rem; color:var(--muted); text-align:center;}
+  .toast{position:fixed; bottom:16px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--success); color:#fff; padding:10px 18px; border-radius:999px; font-size:.82rem; font-weight:600; opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; z-index:50;}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .toast.error{background:var(--error);}
+  #autosave-dot{opacity:0; transition:opacity .3s ease; font-size:.9rem; margin-right:4px;}
+  #autosave-dot.show{opacity:.55;}
+  @media(max-width:760px){
+    main{flex-direction:column;}
+    .editor-pane{width:100%; border-right:none; border-bottom:1px solid var(--border); height:50%;}
+    .preview-pane{height:50%;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="mark">ድ</span> ድርኛ — መጫወቻ</h1>
+  <span class="spacer"></span>
+  <span id="autosave-dot" title="በራስ-ሰር ተቀምጧል (auto-saved)">💾</span>
+  <button class="btn-theme" id="theme-toggle" onclick="toggleTheme()" title="ገጽታ ቀይር (Toggle light/dark)">🌙</button>
+  <button class="btn-run" onclick="runProgram()">▶ አሳይ (Run)</button>
+  <input type="file" id="file-open" accept=".ወብ,.txt" style="display:none" onchange="openWebFile(event)">
+  <button class="btn-dl" onclick="document.getElementById('file-open').click()">📂 ክፈት (Open .ወብ)</button>
+  <button class="btn-dl" onclick="saveWebFile()">💾 አስቀምጥ (Save .ወብ)</button>
+  <button class="btn-dl" onclick="downloadPage()">⬇ አንድ HTML (Download)</button>
+  <button class="btn-run" style="background:var(--primary)" onclick="downloadForHosting()">📦 ለሆስቲንግ ዝግጁ (ZIP)</button>
+  <button class="btn-dl" onclick="if(confirm('የአሁኑን ኮድ አጥፍቶ ከባዶ መጀመር ይፈልጋሉ? This clears the saved code and starts over — it cannot be undone.')) clearAutosaveAndReset()">🗑 ከባዶ ጀምር (Reset)</button>
+</header>
+
+<main>
+  <div class="editor-pane">
+    <div class="tabs">
+      <div class="tab active" data-tab="html">ገጽ.ድር <span style="opacity:.6">(HTML)</span></div>
+      <div class="tab" data-tab="css">ዘይቤ.ድር <span style="opacity:.6">(CSS)</span></div>
+      <div class="tab" data-tab="js">ትእዛዝ.ድር <span style="opacity:.6">(JS)</span></div>
+    </div>
+    <div class="tab-content active" data-tab="html"><textarea id="src-html" spellcheck="false"></textarea></div>
+    <div class="tab-content" data-tab="css"><textarea id="src-css" spellcheck="false"></textarea></div>
+    <div class="tab-content" data-tab="js"><textarea id="src-js" spellcheck="false"></textarea></div>
+  </div>
+
+  <div class="preview-pane">
+    <div class="preview-head"><span>ውጤት (Preview)</span><span id="status">●</span></div>
+    <iframe id="preview" sandbox="allow-scripts allow-modals"></iframe>
+    <div class="warnings" id="warnings"></div>
+  </div>
+</main>
+
+<footer>ድርኛ (Direnya) — በአማርኛ ድረ-ገጽ የመሥሪያ መሣሪያ · Simplexer Project</footer>
+<div class="toast" id="toast"></div>
+
+<!-- ===== CodeMirror (syntax highlighting) — loaded from CDN; the playground degrades
+     gracefully to plain textareas if this is unavailable (e.g. no internet), see initEditors() ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/mode/overlay.min.js"></script>
+
+<!-- ===== Transpiler engine (same files as lib/, inlined for zero-setup use) ===== -->
+<script src="dictionaries.js"></script>
+<script src="html-transpiler.js"></script>
+<script src="css-transpiler.js"></script>
+<script src="js-transpiler.js"></script>
+<script src="web-format.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script>
+/* ---------- tabs ---------- */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelector(`.tab-content[data-tab="${tab.dataset.tab}"]`).classList.add('active');
+  });
+});
+
+/* ---------- editor abstraction: CodeMirror if it loaded, plain textarea otherwise ---------- */
+// This is the ONLY place the rest of the app should read/write editor content —
+// every other function uses getSrc/setSrc, never element.value directly, so the
+// whole app works identically whether CodeMirror loaded (has internet) or not.
+const cmInstances = {}; // { html: CodeMirror|null, css: ..., js: ... }
+
+function getSrc(tab){
+  const cm = cmInstances[tab];
+  return cm ? cm.getValue() : document.getElementById('src-'+tab).value;
+}
+function setSrc(tab, value){
+  const cm = cmInstances[tab];
+  if(cm) cm.setValue(value);
+  else document.getElementById('src-'+tab).value = value;
+}
+
+/* ---------- custom syntax highlighting for the Amharic JS mini-DSL ---------- */
+// An "overlay" mode: real JS highlighting (strings/numbers/comments/etc, via
+// CodeMirror's built-in javascript mode) underneath, with our block-structure
+// keywords and built-in function names painted on top. Word-boundary check
+// mirrors the one in lib/js-transpiler.js's translateLiterals — Ethiopic
+// letters aren't in \w, so \b doesn't work; check neighboring characters by hand.
+function defineDirenyaJSMode(){
+  if(typeof CodeMirror === 'undefined' || typeof CodeMirror.overlayMode !== 'function') return;
+
+  const KEYWORDS = ['ካሆነ','ካልሆነ','ወይም','ድገም','ጊዜ','እያንዳንዱ','በ','ተግባር','ጨርስ','መልስ','እውነት','ሐሰት',
+                     'kahone','kalhone','weyim','digem','gize','eyandandu','be','tegbar','chers','mels','ewnet','hasete'];
+  const BUILTINS = ['ጻፍ','አሳውቅ','አትም','ንጥል_በመለያ','ንጥሎች_በመደብ','ጽሑፍ_አስቀምጥ','ጽሑፍ_አግኝ',
+                     'ስልት_አስቀምጥ','መደብ_ጨምር','መደብ_አስወግድ','መደብ_ቀያይር','ዋጋ_አግኝ','ዋጋ_አስቀምጥ','ስማ',
+                     'tsaf','asawek','atim','nitil_bemeleya','nitiloch_bemedeb','tsihuf_askemt','tsihuf_agn',
+                     'silt_askemt','medeb_chemr','medeb_aswegd','medeb_keyayir','waga_agn','waga_askemt','sima'];
+  const ETHIOPIC = /[\u1200-\u137F]/;
+  const IDENT_CHAR = /[A-Za-z0-9_$\u1200-\u137F]/; // must match the identifier charset used in lib/js-transpiler.js's assignLine regex
+
+  function isBoundary(str, pos){
+    if(pos < 0 || pos >= str.length) return true;
+    return !IDENT_CHAR.test(str[pos]);
+  }
+  function matchWordList(stream, words, className){
+    const rest = stream.string.slice(stream.pos);
+    for(const w of words){
+      if(rest.startsWith(w) && isBoundary(stream.string, stream.pos - 1) && isBoundary(stream.string, stream.pos + w.length)){
+        stream.pos += w.length;
+        return className;
+      }
+    }
+    return null;
+  }
+
+  CodeMirror.defineMode('direnya-js', function(config){
+    const overlay = {
+      token: function(stream){
+        let m;
+        if((m = matchWordList(stream, KEYWORDS, 'direnya-keyword'))) return m;
+        if((m = matchWordList(stream, BUILTINS, 'direnya-builtin'))) return m;
+        stream.next();
+        return null;
+      }
+    };
+    return CodeMirror.overlayMode(CodeMirror.getMode(config, 'javascript'), overlay);
+  });
+}
+
+function initEditors(){
+  if(typeof CodeMirror === 'undefined'){
+    console.warn('CodeMirror did not load (offline?) — falling back to plain textareas.');
+    return;
+  }
+  defineDirenyaJSMode();
+  const common = { lineNumbers:true, lineWrapping:true, viewportMargin:Infinity, tabSize:2, indentUnit:2 };
+  cmInstances.html = CodeMirror.fromTextArea(document.getElementById('src-html'), { ...common, mode:'xml', htmlMode:true });
+  cmInstances.css  = CodeMirror.fromTextArea(document.getElementById('src-css'),  { ...common, mode:'css' });
+  cmInstances.js   = CodeMirror.fromTextArea(document.getElementById('src-js'),   { ...common, mode:'direnya-js' });
+  // Redraw the newly-active editor when switching tabs — CodeMirror measures
+  // itself on init and gets confused if that happens while display:none.
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      const cm = cmInstances[tab.dataset.tab];
+      if(cm) setTimeout(()=>cm.refresh(), 0);
+    });
+  });
+}
+
+/* ---------- starter example ---------- */
+function loadStarterExample(){
+setSrc('html',
+`<ሰነድ>
+  <ራስ><አርእስት>የእኔ ገጽ</አርእስት></ራስ>
+  <ሰውነት>
+    <ራስጌ><ርዕስ1>ሰላም! ስሜ ማን ነው</ርዕስ1></ራስጌ>
+    <ዋና>
+      <አንቀጽ>ይህ በአማርኛ የሠራሁት የመጀመሪያ ገጼ ነው።</አንቀጽ>
+      <አዝራር መደብ="ዋና-አዝራር" ሲነካ="ሰላም_በል()">ጫነኝ</አዝራር>
+      <ክፍል መለያ="ውጤት"></ክፍል>
+    </ዋና>
+  </ሰውነት>
+</ሰነድ>`);
+
+setSrc('css',
+`ሰውነት {
+  የፊደል-ዓይነት: sans-serif;
+  የጀርባ-ቀለም: #F9FAFB;
+}
+ራስጌ {
+  የጀርባ-ቀለም: ሰማያዊ;
+  ቀለም: ነጭ;
+  ውስጠ-ክፍተት: 24px;
+  የጽሑፍ-አሰላለፍ: center;
+}
+.ዋና-አዝራር {
+  የጀርባ-ቀለም: ብርቱካናማ;
+  ቀለም: ነጭ;
+  ድንበር: none;
+  የድንበር-ክብነት: 8px;
+  ውስጠ-ክፍተት: 12px 20px;
+  ጠቋሚ-ቅርጽ: pointer;
+}
+.ደምቆ {
+  የጀርባ-ቀለም: ቢጫ;
+  ውስጠ-ክፍተት: 10px;
+  የድንበር-ክብነት: 6px;
+}`);
+
+setSrc('js',
+`ብዛት = 0
+
+ተግባር ሰላም_በል()
+  ብዛት = ብዛት + 1
+  ጻፍ("ጠቅ ብዛት: " + ብዛት)
+  ካሆነ ብዛት >= 3
+    እቃ = ንጥል_በመለያ("ውጤት")
+    መደብ_ጨምር(እቃ, "ደምቆ")
+  ጨርስ
+ጨርስ`);
+}
+
+/* ---------- autosave (localStorage, per-browser, no server) ---------- */
+// Saves html/css/js to localStorage on every edit (debounced), and restores
+// on the next visit instead of the starter example — so closing the tab or
+// refreshing never loses work. Storage is per-browser/per-device only (not
+// synced across devices), and is cleared if the person clears site data.
+const AUTOSAVE_KEY = 'direnya-playground-autosave-v1';
+const THEME_KEY = 'direnya-playground-theme';
+let autosaveTimer = null;
+let autosaveDotTimer = null;
+
+function applyStoredTheme(){
+  let saved;
+  try{ saved = localStorage.getItem(THEME_KEY); }catch(err){ saved = null; }
+  if(saved === 'light'){
+    document.body.classList.add('light-mode');
+    const btn = document.getElementById('theme-toggle');
+    if(btn) btn.textContent = '☀️';
+  }
+}
+function toggleTheme(){
+  const isLight = document.body.classList.toggle('light-mode');
+  const btn = document.getElementById('theme-toggle');
+  if(btn) btn.textContent = isLight ? '☀️' : '🌙';
+  try{ localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark'); }catch(err){}
+}
+
+function autosaveNow(){
+  try{
+    const payload = { html: getSrc('html'), css: getSrc('css'), js: getSrc('js'), savedAt: Date.now() };
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(payload));
+    const dot = document.getElementById('autosave-dot');
+    if(dot){ dot.classList.add('show'); clearTimeout(autosaveDotTimer); autosaveDotTimer = setTimeout(()=>dot.classList.remove('show'), 900); }
+  }catch(err){
+    // localStorage can throw if full or disabled (private browsing) — autosave
+    // is a convenience, not a requirement, so fail silently rather than
+    // interrupting the person's work with an error they can't act on.
+    console.warn('Autosave failed (localStorage unavailable):', err);
+  }
+}
+function scheduleAutosave(){
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(autosaveNow, 600);
+}
+function tryRestoreAutosave(){
+  let raw;
+  try{ raw = localStorage.getItem(AUTOSAVE_KEY); }catch(err){ return false; }
+  if(!raw) return false;
+  try{
+    const { html, css, js } = JSON.parse(raw);
+    setSrc('html', html || '');
+    setSrc('css', css || '');
+    setSrc('js', js || '');
+    return true;
+  }catch(err){
+    console.warn('Autosave data was corrupted, ignoring it:', err);
+    return false;
+  }
+}
+function clearAutosaveAndReset(){
+  try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(err){}
+  loadStarterExample();
+  runProgram();
+  showToast('✓ ከባዶ ተጀምሯል');
+}
+function wireAutosaveListeners(){
+  ['html','css','js'].forEach(tab=>{
+    const cm = cmInstances[tab];
+    if(cm) cm.on('change', scheduleAutosave);
+    else document.getElementById('src-'+tab).addEventListener('input', scheduleAutosave);
+  });
+  window.addEventListener('beforeunload', autosaveNow);
+}
+
+/* ---------- runtime shim injected into every preview ---------- */
+// Keep in sync BY HAND with lib/runtime.js — see scripts/sync-playground.js
+// and the Developer Guide §3 for exactly why this can't be a loaded file.
+const RUNTIME_JS = `
+/* ============================================================
+   ድርኛ (Direnya) — browser runtime
+   Defines the built-in Amharic functions available to any
+   transpiled ትእዛዝ (script) program running on a page.
+   Include this BEFORE the transpiled <script> in the output HTML.
+   ============================================================ */
+function ጻፍ(እሴት) {
+  // Prints to the page. Looks for an element with id="ውጤት"
+  // (meaning "result/output"); falls back to document.body.
+  var target = document.getElementById('ውጤት') || document.body;
+  var line = document.createElement('div');
+  line.textContent = እሴት;
+  target.appendChild(line);
+}
+function አሳውቅ(እሴት) {
+  // Shows a popup alert box.
+  window.alert(እሴት);
+}
+function አትም(እሴት) {
+  // Logs to the browser console (for debugging, not visible on page).
+  console.log(እሴት);
+}
+
+/* ---------- DOM access & control ----------
+   These let a program reach into and change the page it's running on —
+   not just write new content at the end, but find an existing element
+   and read or change it. Element/class-name VALUES (e.g. "ውጤት") are
+   never translated — only tag/attribute NAMES are (see html-transpiler.js)
+   — so the id you write in ገጽ.ድር is exactly the string you pass here. */
+
+function በመለያ(መለያ) {
+  // "element by id" — document.getElementById
+  return document.getElementById(መለያ);
+}
+function በመደብ(መደብ) {
+  // "elements by class" — returns a real array (not a live HTMLCollection),
+  // so ድገም/እያንዳንዱ loops over it behave predictably.
+  return Array.from(document.getElementsByClassName(መደብ));
+}
+// ንጥል_በመለያ / ንጥሎች_በመደብ — the original, longer names, kept as working
+// aliases so any lesson or project written before the shorter በመለያ/በመደብ
+// names existed keeps working unchanged.
+var ንጥል_በመለያ = በመለያ;
+var ንጥሎች_በመደብ = በመደብ;
+
+function ጽሑፍ_አስቀምጥ(እቃ, ጽሑፍ) {
+  // "set text" — replaces an element's visible text.
+  if (እቃ) እቃ.textContent = ጽሑፍ;
+}
+
+function ጽሑፍ_አ(እቃ, ጽሑፍ) {
+  // "set text" — replaces an element's visible text.
+  if (እቃ) እቃ.textContent = ጽሑፍ;
+}
+
+function ጽሑፍ_አግኝ(እቃ) {
+  // "get text" — reads an element's visible text.
+  return እቃ ? እቃ.textContent : '';
+}
+
+function ስልት_አስቀምጥ(እቃ, ንብረት, ዋጋ) {
+  // "set style" — e.g. ስልት_አስቀምጥ(እቃ, "color", "red")
+  // ንብረት (property) is a plain CSS property name in camelCase JS form
+  // (e.g. "backgroundColor"), written as-is — not translated, same
+  // reasoning as attribute VALUES elsewhere: it's data, not vocabulary.
+  if (እቃ) እቃ.style[ንብረት] = ዋጋ;
+}
+
+function ስልት_አ(እቃ, ንብረት, ዋጋ) {
+  // "set style" — e.g. ስልት_አስቀምጥ(እቃ, "color", "red")
+  // ንብረት (property) is a plain CSS property name in camelCase JS form
+  // (e.g. "backgroundColor"), written as-is — not translated, same
+  // reasoning as attribute VALUES elsewhere: it's data, not vocabulary.
+  if (እቃ) እቃ.style[ንብረት] = ዋጋ;
+}
+
+function መደብ_ጨምር(እቃ, መደብ) {
+  // "add class"
+  if (እቃ) እቃ.classList.add(መደብ);
+}
+function መደብ_አስወግድ(እቃ, መደብ) {
+  // "remove class"
+  if (እቃ) እቃ.classList.remove(መደብ);
+}
+function መደብ_ቀያይር(እቃ, መደብ) {
+  // "toggle class"
+  if (እቃ) እቃ.classList.toggle(መደብ);
+}
+
+function መደብ_ቀ(እቃ, መደብ) {
+  // "toggle class"
+  if (እቃ) እቃ.classList.toggle(መደብ);
+}
+
+function ዋጋ_አግኝ(እቃ) {
+  // "get value" — reads a form field's current value (input/select/textarea).
+  return እቃ ? እቃ.value : undefined;
+}
+function ዋጋ_አስቀምጥ(እቃ, ዋጋ) {
+  // "set value" — writes a form field's value.
+  if (እቃ) እቃ.value = ዋጋ;
+}
+
+var ክስተት_ስሞች = {
+  "ጠቅታ": "click",
+  "ግቤት": "input",
+  "ለውጥ": "change",
+  "ማስረከብ": "submit",
+  "ጭነት": "load",
+  "ቁልፍ-ጭነት": "keydown",
+  "ቁልፍ-ጭ": "keydown",
+  "ቁልፍ-ልቀት": "keyup",
+  "ቁልፍ-ል": "keyup",
+};
+
+function ስማ(እቃ, ክስተት, ተግባር) {
+  // "listen" — addEventListener, for anything beyond the ሲነካ (onclick)
+  // attribute — e.g. ስማ(ማስገቢያ, "ግቤት", ተግባር) for live typing.
+  // ክስተት (event name) can be the Amharic word above, OR the plain
+  // English string ("click"/"input"/"change"...) if you prefer — both
+  // work, since real DOM event names are never actually renamed.
+  var እውነተኛ_ክስተት = ክስተት_ስሞች[ክስተት] || ክስተት;
+  if (እቃ) እቃ.addEventListener(እውነተኛ_ክስተት, ተግባር);
+}
+
+
+/* ---------- Latin aliases ----------
+   Same functions, callable without an Amharic keyboard — e.g. tsaf(x)
+   does exactly what ጻፍ(x) does, because it IS ጻፍ, just under a second
+   name. This list must match dictionaries.js's RUNTIME_ALIASES table —
+   that table is the documentation/source of truth for which aliases
+   SHOULD exist; these assignments are what actually makes them real. */
+var tsaf = ጻፍ;
+var asawek = አሳውቅ;
+var atim = አትም;
+var nitil_bemeleya = በመለያ;
+var nitiloch_bemedeb = በመደብ;
+var tsihuf_askemt = ጽሑፍ_አስቀምጥ;
+var tsihuf_a = ጽሑፍ_አ;
+var tsihuf_agn = ጽሑፍ_አግኝ;
+var silt_askemt = ስልት_አስቀምጥ;
+var silt_a = ስልት_አ;
+var medeb_chemr = መደብ_ጨምር;
+var medeb_aswegd = መደብ_አስወግድ;
+var medeb_keyayir = መደብ_ቀያይር;
+var medeb_k = መደብ_ቀ;
+var waga_agn = ዋጋ_አግኝ;
+var waga_askemt = ዋጋ_አስቀምጥ;
+var sima = ስማ;
+`;
+
+// Same fix as lib/build.js: handles pages with no explicit ራስ (head)
+// section without producing a dangling, unmatched closing tag.
+function injectIntoHead(html, block){
+  if(/<\/head>/i.test(html)) return html.replace(/<\/head>/i, block+'\n</head>');
+  if(/<html[^>]*>/i.test(html)) return html.replace(/(<html[^>]*>)/i, `$1\n<head>\n${block}\n</head>`);
+  return block + '\n' + html;
+}
+function injectBeforeBodyClose(html, block){
+  if(/<\/body>/i.test(html)) return html.replace(/<\/body>/i, block+'\n</body>');
+  if(/<\/html>/i.test(html)) return html.replace(/<\/html>/i, block+'\n</html>');
+  return html + '\n' + block;
+}
+
+function buildFullHtml(){
+  const htmlSrc = getSrc('html');
+  const cssSrc  = getSrc('css');
+  const jsSrc   = getSrc('js');
+
+  const warnings = [];
+  const { html, warnings: hw } = transpileHTML(htmlSrc);
+  warnings.push(...hw.map(w=>'[ገጽ.ድር] '+w));
+  const { css, warnings: cw } = transpileCSS(cssSrc);
+  warnings.push(...cw.map(w=>'[ዘይቤ.ድር] '+w));
+  const { js, warnings: jw } = transpileJS(jsSrc);
+  warnings.push(...jw.map(w=>'[ትእዛዝ.ድር] '+w));
+
+  let out = injectIntoHead(html, `<style>${css}</style>`);
+  out = injectBeforeBodyClose(out, `<script>${RUNTIME_JS}\n${js}<\/script>`);
+  if(!/<!doctype/i.test(out)) out = '<!DOCTYPE html>\n'+out;
+
+  return { fullHtml: out, warnings };
+}
+
+function runProgram(){
+  const { fullHtml, warnings } = buildFullHtml();
+  document.getElementById('preview').srcdoc = fullHtml;
+  const wBox = document.getElementById('warnings');
+  if(warnings.length){
+    wBox.innerHTML = warnings.map(w=>'⚠ '+w).join('<br>');
+    wBox.classList.add('show');
+    document.getElementById('status').style.color = 'var(--secondary)';
+  } else {
+    wBox.classList.remove('show');
+    document.getElementById('status').style.color = 'var(--success)';
+  }
+}
+
+function downloadPage(){
+  const { fullHtml } = buildFullHtml();
+  const blob = new Blob([fullHtml], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'የእኔ-ገጽ.html';
+  a.click();
+  showToast('✓ አንድ HTML ፋይል ወረደ');
+}
+
+/* ---------- toast ---------- */
+let toastTimer = null;
+function showToast(msg, isError){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.toggle('error', !!isError);
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2600);
+}
+
+/* ---------- .ወብ open / save (single real file, three sections) ---------- */
+function saveWebFile(){
+  const source = serializeWeb({
+    html: getSrc('html'),
+    css:  getSrc('css'),
+    js:   getSrc('js'),
+  });
+  const blob = new Blob([source], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'የእኔ-ገጽ.ወብ';
+  a.click();
+  showToast('✓ .ወብ ፋይል ተቀምጧል');
+}
+
+function openWebFile(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const { html, css, js, hadExplicitSections } = parseWeb(reader.result);
+      setSrc('html', html);
+      setSrc('css', css);
+      setSrc('js', js);
+      runProgram();
+      showToast(hadExplicitSections ? `✓ "${file.name}" ተከፍቷል` : `✓ "${file.name}" እንደ ገጽ (HTML) ተከፍቷል`);
+    }catch(err){
+      showToast('✗ ፋይሉን መክፈት አልተቻለም', true);
+      console.error(err);
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+  event.target.value = ''; // allow re-opening the same filename later
+}
+
+/* ---------- "ready to host" export: real separate index.html / style.css / script.js ---------- */
+async function downloadForHosting(){
+  const htmlSrc = getSrc('html');
+  const cssSrc  = getSrc('css');
+  const jsSrc   = getSrc('js');
+
+  const warnings = [];
+  const { html, warnings: hw } = transpileHTML(htmlSrc);
+  warnings.push(...hw);
+  const { css, warnings: cw } = transpileCSS(cssSrc);
+  warnings.push(...cw);
+  const { js, warnings: jw } = transpileJS(jsSrc);
+  warnings.push(...jw);
+
+  // Link real, separate files instead of inlining — this is what makes
+  // the export "ready to upload": three normal static-site files.
+  let outHtml = html;
+  if(css.trim()) outHtml = injectIntoHead(outHtml, `<link rel="stylesheet" href="style.css">`);
+  if(js.trim()) outHtml = injectBeforeBodyClose(outHtml, `<script src="runtime.js"><\/script>\n<script src="script.js"><\/script>`);
+  if(!/<!doctype/i.test(outHtml)) outHtml = '<!DOCTYPE html>\n' + outHtml;
+
+  const zip = new JSZip();
+  zip.file('index.html', outHtml);
+  if(css.trim()) zip.file('style.css', css);
+  if(js.trim()){
+    zip.file('script.js', js);
+    zip.file('runtime.js', RUNTIME_JS.trim()); // same constant the live preview uses — one source, not a second hand-typed copy
+  }
+
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'የእኔ-ገጽ-ለሆስቲንግ.zip';
+  a.click();
+
+  showToast(warnings.length ? `⚠ ${warnings.length} ማስጠንቀቂያ(ዎች) ጋር ወረደ` : '✓ ZIP ተዘጋጅቷል — index.html/style.css/script.js');
+}
+
+// set up editors, then run once so the preview isn't blank
+window.addEventListener('DOMContentLoaded', () => {
+  applyStoredTheme();
+  initEditors();
+  const restored = tryRestoreAutosave();
+  if(!restored) loadStarterExample();
+  wireAutosaveListeners();
+  runProgram();
+  if(restored) showToast('✓ ካለፈው ክፍለ ጊዜ ተመልሷል (auto-saved)');
+});
+</script>
+</body>
+</html>

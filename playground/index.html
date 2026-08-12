@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ድርኛ — መጫወቻ (Direnya Playground)</title>
+<title>ድርኛ — መጫወቻ (Diregna Playground)</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <style>
@@ -25,8 +25,8 @@
   body.light-mode .cm-number{color:#B45309;}
   body.light-mode .cm-property{color:#0369A1;}
   body.light-mode .cm-atom{color:#B45309;}
-  body.light-mode .cm-direnya-keyword{color:#B45309;}
-  body.light-mode .cm-direnya-builtin{color:#6D28D9;}
+  body.light-mode .cm-diregna-keyword{color:#B45309;}
+  body.light-mode .cm-diregna-builtin{color:#6D28D9;}
   body.light-mode .cm-comment{color:var(--muted);}
   *{box-sizing:border-box;}
   body{margin:0; font-family:'Noto Sans Ethiopic',sans-serif; background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column;}
@@ -68,8 +68,8 @@
   .cm-comment{color:var(--muted); font-style:italic;}
   .cm-property{color:#7DD3FC;}            /* CSS property names — structural, works for Amharic property names too */
   .cm-atom{color:#FCD34D;}
-  .cm-direnya-keyword{color:#F59E0B; font-weight:600;}   /* ካሆነ/ጨርስ/ወይም/ድገም/ተግባር/... */
-  .cm-direnya-builtin{color:#C4B5FD; font-weight:600;}   /* ጻፍ/አሳውቅ/አትም */
+  .cm-diregna-keyword{color:#F59E0B; font-weight:600;}   /* ካሆነ/ጨርስ/ወይም/ድገም/ተግባር/... */
+  .cm-diregna-builtin{color:#C4B5FD; font-weight:600;}   /* ጻፍ/አሳውቅ/አትም */
   .preview-pane{flex:1; display:flex; flex-direction:column; min-width:280px;}
   .preview-head{background:var(--panel); border-bottom:1px solid var(--border); padding:8px 14px; font-size:.78rem; color:var(--muted); display:flex; justify-content:space-between; align-items:center;}
   iframe{flex:1; border:none; background:#fff;}
@@ -128,7 +128,7 @@
   </div>
 </main>
 
-<footer>ድርኛ (Direnya) — በአማርኛ ድረ-ገጽ የመሥሪያ መሣሪያ · Simplexer Project</footer>
+<footer>ድርኛ (Diregna) — በአማርኛ ድረ-ገጽ የመሥሪያ መሣሪያ · Simplexer Project</footer>
 <div class="toast" id="toast"></div>
 
 <!-- ===== CodeMirror (syntax highlighting) — loaded from CDN; the playground degrades
@@ -180,7 +180,7 @@ function setSrc(tab, value){
 // keywords and built-in function names painted on top. Word-boundary check
 // mirrors the one in lib/js-transpiler.js's translateLiterals — Ethiopic
 // letters aren't in \w, so \b doesn't work; check neighboring characters by hand.
-function defineDirenyaJSMode(){
+function defineDiregnaJSMode(){
   if(typeof CodeMirror === 'undefined' || typeof CodeMirror.overlayMode !== 'function') return;
 
   const KEYWORDS = ['ካሆነ','ካልሆነ','ወይም','ድገም','ጊዜ','እያንዳንዱ','በ','ተግባር','ጨርስ','መልስ','እውነት','ሐሰት',
@@ -207,12 +207,12 @@ function defineDirenyaJSMode(){
     return null;
   }
 
-  CodeMirror.defineMode('direnya-js', function(config){
+  CodeMirror.defineMode('diregna-js', function(config){
     const overlay = {
       token: function(stream){
         let m;
-        if((m = matchWordList(stream, KEYWORDS, 'direnya-keyword'))) return m;
-        if((m = matchWordList(stream, BUILTINS, 'direnya-builtin'))) return m;
+        if((m = matchWordList(stream, KEYWORDS, 'diregna-keyword'))) return m;
+        if((m = matchWordList(stream, BUILTINS, 'diregna-builtin'))) return m;
         stream.next();
         return null;
       }
@@ -226,11 +226,11 @@ function initEditors(){
     console.warn('CodeMirror did not load (offline?) — falling back to plain textareas.');
     return;
   }
-  defineDirenyaJSMode();
+  defineDiregnaJSMode();
   const common = { lineNumbers:true, lineWrapping:true, viewportMargin:Infinity, tabSize:2, indentUnit:2 };
   cmInstances.html = CodeMirror.fromTextArea(document.getElementById('src-html'), { ...common, mode:'xml', htmlMode:true });
   cmInstances.css  = CodeMirror.fromTextArea(document.getElementById('src-css'),  { ...common, mode:'css' });
-  cmInstances.js   = CodeMirror.fromTextArea(document.getElementById('src-js'),   { ...common, mode:'direnya-js' });
+  cmInstances.js   = CodeMirror.fromTextArea(document.getElementById('src-js'),   { ...common, mode:'diregna-js' });
   // Redraw the newly-active editor when switching tabs — CodeMirror measures
   // itself on init and gets confused if that happens while display:none.
   document.querySelectorAll('.tab').forEach(tab=>{
@@ -299,8 +299,8 @@ setSrc('js',
 // on the next visit instead of the starter example — so closing the tab or
 // refreshing never loses work. Storage is per-browser/per-device only (not
 // synced across devices), and is cleared if the person clears site data.
-const AUTOSAVE_KEY = 'direnya-playground-autosave-v1';
-const THEME_KEY = 'direnya-playground-theme';
+const AUTOSAVE_KEY = 'diregna-playground-autosave-v1';
+const THEME_KEY = 'diregna-playground-theme';
 let autosaveTimer = null;
 let autosaveDotTimer = null;
 
@@ -372,7 +372,7 @@ function wireAutosaveListeners(){
 // and the Developer Guide §3 for exactly why this can't be a loaded file.
 const RUNTIME_JS = `
 /* ============================================================
-   ድርኛ (Direnya) — browser runtime
+   ድርኛ (Diregna) — browser runtime
    Defines the built-in Amharic functions available to any
    transpiled ትእዛዝ (script) program running on a page.
    Include this BEFORE the transpiled <script> in the output HTML.

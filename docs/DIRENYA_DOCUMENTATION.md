@@ -1,4 +1,4 @@
-# ድርኛ (Direnya) — An Amharic Language for Building Websites
+# ድርኛ (Diregna) — An Amharic Language for Building Websites
 
 **A complete design document, working implementation, and teaching guide.**
 Everything described here has been built and tested — not just planned. Code samples in this document are real, running code, copied from the actual working project.
@@ -7,7 +7,7 @@ Everything described here has been built and tested — not just planned. Code s
 
 ## 1. What This Is, In One Sentence
 
-**ድርኛ (Direnya)** lets someone write a real, working website — structure, style, and interactivity — entirely in Amharic, using words like `<ራስጌ>` instead of `<header>` and `ካሆነ` instead of `if`, which a small program then translates into the real HTML/CSS/JavaScript that every browser on Earth already understands.
+**ድርኛ (Diregna)** lets someone write a real, working website — structure, style, and interactivity — entirely in Amharic, using words like `<ራስጌ>` instead of `<header>` and `ካሆነ` instead of `if`, which a small program then translates into the real HTML/CSS/JavaScript that every browser on Earth already understands.
 
 Nothing new is invented at the browser level. Amharic goes in, standard HTML/CSS/JS comes out. This is the single most important design decision in this whole project, so it's worth explaining why before anything else.
 
@@ -20,18 +20,18 @@ There are two fundamentally different ways to make "a website builder in Amharic
 | Approach | What it means | Verdict |
 |---|---|---|
 | **A. Build a new browser/engine** that natively understands Amharic markup | Reimplement HTML parsing, CSS layout (the box model, flexbox, rendering), and a JS engine — from scratch, in Amharic | **Do not do this.** This is a multi-year, multi-person effort (browser engines are some of the most complex software that exists). It would only run in your own custom app, not the web. |
-| **B. Translate Amharic source into real HTML/CSS/JS** (a *transpiler*) | Kids write in Amharic; a small program converts it to the exact same code a professional web developer would write; a normal browser runs that | **This is what Direnya does.** A transpiler for a fixed vocabulary is a weekend-to-a-few-weeks project, not a multi-year one — and the output runs on every device that already has a browser, with zero extra software installed. |
+| **B. Translate Amharic source into real HTML/CSS/JS** (a *transpiler*) | Kids write in Amharic; a small program converts it to the exact same code a professional web developer would write; a normal browser runs that | **This is what Diregna does.** A transpiler for a fixed vocabulary is a weekend-to-a-few-weeks project, not a multi-year one — and the output runs on every device that already has a browser, with zero extra software installed. |
 
 **Approach B is what every real "localized programming language" project actually does**, including the ones that inspired this design:
 
-- **Hedy** (hedy.org) — a gradually-complex programming language, built specifically for teaching kids, that supports dozens of natural languages including Arabic, and transpiles a simplified syntax down to real Python. Its "translate keywords, keep the underlying language real" philosophy is the direct model for Direnya's JS layer.
+- **Hedy** (hedy.org) — a gradually-complex programming language, built specifically for teaching kids, that supports dozens of natural languages including Arabic, and transpiles a simplified syntax down to real Python. Its "translate keywords, keep the underlying language real" philosophy is the direct model for Diregna's JS layer.
 - **Qalb** (Arabic) and **ChhotiSi** (Hindi) — esoteric/teaching languages that translate Arabic/Hindi keywords into a real interpreter's syntax.
 - **Scratch** — sidesteps the text-translation problem entirely by using visual blocks (Scratch is localized into Amharic-adjacent languages via block *labels*, not by reinventing the engine). Worth knowing about as an alternative/complement for younger kids — see §11.
 - Ruby's creator (Matz) originally used Japanese keywords in early prototypes before settling on English for the public release — a reminder that this idea (native-language keywords over a real engine) is old and well-trodden, not experimental.
 
 **One technical fact makes the JavaScript layer of this project dramatically simpler than it would otherwise be, and it's worth stating plainly because it shapes everything downstream:**
 
-> Modern JavaScript **already allows Amharic (Ethiopic-script) letters as variable and function names.** This is not a Direnya feature — it's a basic property of the JavaScript language specification (identifiers can be any Unicode "letter" character). It was verified directly for this project:
+> Modern JavaScript **already allows Amharic (Ethiopic-script) letters as variable and function names.** This is not a Diregna feature — it's a basic property of the JavaScript language specification (identifiers can be any Unicode "letter" character). It was verified directly for this project:
 > ```js
 > let ስም = 'ሰላም';
 > function ጻፍ(x){ console.log('WROTE:', x); }
@@ -40,7 +40,7 @@ There are two fundamentally different ways to make "a website builder in Amharic
 > ```
 > This runs, unmodified, in Node.js, Chrome, Firefox, and Safari today.
 
-Because of this, Direnya's JavaScript layer does **not** need to translate variable names, function names, or most of the language. It only needs to translate the small set of *structural* keywords (`if`, `else`, a loop, a function definition, `end`) that aren't valid Amharic-as-JS on their own. Everything else — arithmetic, strings, comparisons, calling functions — is just... already Amharic, because JS lets it be. This single fact is why the JS transpiler in this project is ~140 lines instead of a few thousand.
+Because of this, Diregna's JavaScript layer does **not** need to translate variable names, function names, or most of the language. It only needs to translate the small set of *structural* keywords (`if`, `else`, a loop, a function definition, `end`) that aren't valid Amharic-as-JS on their own. Everything else — arithmetic, strings, comparisons, calling functions — is just... already Amharic, because JS lets it be. This single fact is why the JS transpiler in this project is ~140 lines instead of a few thousand.
 
 ---
 
@@ -88,7 +88,7 @@ Every box above exists as a real file in the project (see §9 for the full file 
 4. Edit any word in the left panel — Amharic or its Latin alias (§5.4) — click Run again, watch it change instantly.
 5. Save your work: **💾 አስቀምጥ** saves everything as one real `.ወብ` file (§6.5) you can reopen later with **📂 ክፈት**. When you're ready to publish: **⬇ አንድ HTML** for a single portable file, or **📦 ለሆስቲንግ ዝግጁ** for a real `index.html`/`style.css`/`script.js` set ready to upload to a static host (§6.6).
 
-The moment you download either output, **Direnya's job is done** — the result has no dependency on Direnya at all, it's just HTML/CSS/JS.
+The moment you download either output, **Diregna's job is done** — the result has no dependency on Diregna at all, it's just HTML/CSS/JS.
 
 ---
 
@@ -557,7 +557,7 @@ This is implemented in `lib/web-format.js` (`parseWeb` / `serializeWeb`), tested
 
 The original single-file Download (`⬇ አንድ HTML`) inlines everything into one `.html` — great for "email it to someone" or "open it locally," not what you want to **upload to a static host**, where separate `index.html` / `style.css` / `script.js` files are the normal shape of a real site.
 
-**📦 ለሆስቲንግ ዝግጁ (ZIP)** produces exactly that: `index.html` (linking to the other two with real `<link>`/`<script src>` tags, not inlining them), `style.css`, `script.js`, and `runtime.js` (the small shim that defines `ጻፍ`/`አሳውቅ`/`አትም`). Unzip it, upload the whole folder to Vercel/Netlify/GitHub Pages/anywhere — it's a normal static site at that point, with zero remaining dependency on Direnya.
+**📦 ለሆስቲንግ ዝግጁ (ZIP)** produces exactly that: `index.html` (linking to the other two with real `<link>`/`<script src>` tags, not inlining them), `style.css`, `script.js`, and `runtime.js` (the small shim that defines `ጻፍ`/`አሳውቅ`/`አትም`). Unzip it, upload the whole folder to Vercel/Netlify/GitHub Pages/anywhere — it's a normal static site at that point, with zero remaining dependency on Diregna.
 
 The same two output shapes are available from the command line via `lib/build.js`, which now accepts either a `.ወብ` file or a project folder as input:
 
@@ -614,14 +614,14 @@ Teach `ትእዛዝ.ድር`, `አዝራር`/`ሲነካ`, `ጻፍ()`. Goal: a but
 
 After Lesson 4, a student has touched every layer of the pipeline and can, in principle, read this entire document's Language Reference (§5) as just filling in more vocabulary on a system they already understand structurally.
 
-**Note on younger kids (roughly under 9–10):** consider Scratch *first*, and treat Direnya as the "graduation" step once a kid is comfortable with sequential instructions and wants to see real code and a real, hostable webpage. This mirrors what MIT's own research and Hedy's design explicitly recommend — block-based tools remove syntax-error frustration for the very newest learners; text-based tools become more motivating once a learner wants their work to look and feel like "real programming." Forcing a 7-year-old straight into typed syntax (Amharic or not) fights the tool against the age group rather than for it.
+**Note on younger kids (roughly under 9–10):** consider Scratch *first*, and treat Diregna as the "graduation" step once a kid is comfortable with sequential instructions and wants to see real code and a real, hostable webpage. This mirrors what MIT's own research and Hedy's design explicitly recommend — block-based tools remove syntax-error frustration for the very newest learners; text-based tools become more motivating once a learner wants their work to look and feel like "real programming." Forcing a 7-year-old straight into typed syntax (Amharic or not) fights the tool against the age group rather than for it.
 
 ---
 
 ## 9. Where Everything Lives (Project Structure)
 
 ```
-direnya/
+diregna/
   lib/
     dictionaries.js        ← every Amharic<->real-word mapping (+ Latin aliases), single source of truth
     html-transpiler.js     ← translates ገጽ.ድር → real HTML
@@ -684,7 +684,7 @@ E.g. `<ማስገቢያ ዓይነት="text">` — the word `text` here is a real 
 - **Phase 2 — richer JS:** ~~more control flow (`ወይም` for elif-style chains)~~ — **done.** Still open: arrays/list built-ins with Amharic method names, more math helpers.
 - ~~DOM access & control~~ — **done.** 11 built-ins (§5.3) for finding elements, reading/writing text and values, styling, classes, and event listeners — this is what turns a page from "write once" into genuinely interactive.
 - ~~Typing without an Amharic keyboard~~ — **done** for the language's own vocabulary (§5.4). Explicitly still open: a general Amharic transliteration input method for free-form *content* text — a materially bigger, different project, not attempted here.
-- **Phase 3 — one-click real publishing:** §6.6 covers "download a real, upload-ready set of files" — that part is done. What's still missing is the *upload* itself: a logged-in student clicking "አሳትም" (Publish) and getting a real hosted URL immediately — e.g. `student-name.direnya.et` — with no separate trip to Vercel/Netlify. That needs simple static file storage behind it (this reuses the exact same Supabase Storage + static hosting pattern already specified in the Simplexer platform's own SRS, §14 of that document — same infrastructure, no new backend paradigm needed).
+- **Phase 3 — one-click real publishing:** §6.6 covers "download a real, upload-ready set of files" — that part is done. What's still missing is the *upload* itself: a logged-in student clicking "አሳትም" (Publish) and getting a real hosted URL immediately — e.g. `student-name.diregna.et` — with no separate trip to Vercel/Netlify. That needs simple static file storage behind it (this reuses the exact same Supabase Storage + static hosting pattern already specified in the Simplexer platform's own SRS, §14 of that document — same infrastructure, no new backend paradigm needed).
 - **Phase 4 — Simplexer integration:** ship this as a new **Interest Track course** ("የድር ገጽ አሠራር በአማርኛ" — "Building Webpages in Amharic") inside the existing Simplexer platform (see the separate Simplexer SRS), using the playground as an embedded lesson type alongside video/text lessons — the natural home for this project, per your original framing.
 
 **Explicitly out of scope, on purpose:** a full Amharic programming language for general-purpose (non-web) programming; a from-scratch rendering engine; support for the entire modern HTML/CSS/JS surface area; a general Amharic transliteration typing system. All would trade a working, honest teaching tool today for a much bigger, likely-unfinished project.
@@ -714,4 +714,4 @@ Every one of the following was actually executed against the real code in this p
 
 ## 13. Naming Note
 
-"ድርኛ" (Direnya) combines **ድር** (*dir* — "web," as in ድር-ገጽ, "web-page") with the **-ኛ** suffix pattern used for "one who does/makes" — read loosely as "web-maker" or "the web, in [our] own language." Two alternates considered, in case this name doesn't stick with the people you test it on: **ገጽኛ** (Getsenya — "page-maker") and **ኢትዮ-ድር** (Ethio-Dir — more literal, less elegant). Worth testing all three on an actual group of kids before locking one in — naming is cheap to change now and expensive to change after it's on a certificate or a URL.
+"ድርኛ" (Diregna) combines **ድር** (*dir* — "web," as in ድር-ገጽ, "web-page") with the **-ኛ** suffix pattern used for "one who does/makes" — read loosely as "web-maker" or "the web, in [our] own language." Two alternates considered, in case this name doesn't stick with the people you test it on: **ገጽኛ** (Getsenya — "page-maker") and **ኢትዮ-ድር** (Ethio-Dir — more literal, less elegant). Worth testing all three on an actual group of kids before locking one in — naming is cheap to change now and expensive to change after it's on a certificate or a URL.

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /* ============================================================
-   ድርኛ (Direnya) — dev tool: rename-project.js
+   ድርኛ (Diregna) — dev tool: rename-project.js
    -------------------------------------------------------------
    Renames the project itself — NOT a dictionary word (for that,
    see scripts/sync-playground.js and the note in dictionaries.js).
-   This tool exists because "ድርኛ"/"Direnya"/"direnya" are just
+   This tool exists because "ድርኛ"/"Diregna"/"diregna" are just
    plain branding TEXT sprinkled across ~18 files (page titles,
    comments, a CodeMirror mode name, README/docs) — not data any
    transpiler reads — so the fix is a careful find-and-replace,
@@ -15,16 +15,16 @@
 
      node scripts/rename-project.js \
        --amharic="ድርኛ:NEWAMHARIC" \
-       --latin="Direnya:NewName" \
-       --lower="direnya:newname"
+       --latin="Diregna:NewName" \
+       --lower="diregna:newname"
 
    Review the output, then re-run the exact same command with
    --apply added at the end to actually write the changes:
 
      node scripts/rename-project.js \
        --amharic="ድርኛ:NEWAMHARIC" \
-       --latin="Direnya:NewName" \
-       --lower="direnya:newname" \
+       --latin="Diregna:NewName" \
+       --lower="diregna:newname" \
        --apply
 
    All three pairs are optional — pass only the ones you want to

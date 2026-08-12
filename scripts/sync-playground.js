@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ============================================================
-   ድርኛ (Direnya) — dev tool: sync-playground.js
+   ድርኛ (Diregna) — dev tool: sync-playground.js
    -------------------------------------------------------------
    playground/index.html can't use require() or fetch() sibling
    files reliably (fetch() of local files is blocked by CORS when

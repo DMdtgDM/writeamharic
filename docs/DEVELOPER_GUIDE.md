@@ -1,4 +1,4 @@
-# ድርኛ (Direnya) — Developer Guide
+# ድርኛ (Diregna) — Developer Guide
 
 This is the internals document — how the system actually works under the hood, how to set up and run it locally, and how to extend it. Everything in here was run for real while writing this guide, including a real bug that was found, fixed, and regression-tested in the process (§5) — that section is a genuine worked example, not a hypothetical.
 
@@ -18,7 +18,7 @@ There is no build step, no bundler, no `npm install` required for the core proje
 | Running/testing the playground | Any browser. Literally double-click `playground/index.html`. No server. |
 | Running `scripts/sync-playground.js` | Node.js. |
 
-**VS Code specifically**, since it's the most common choice: it handles Amharic text natively (font rendering, cursor movement, search — all fine out of the box). What it does *not* do is syntax-highlight `.ወብ` files specially — they'll show up as plain text, since there's no VS Code language extension for Direnya (that's a real, legitimate future project — a `.ወብ` TextMate grammar highlighting the `#ገጽ`/`#ዘይቤ`/`#ትእዛዝ` markers and delegating each section to HTML/CSS/JS highlighting — but it doesn't exist yet, and isn't needed to be productive today).
+**VS Code specifically**, since it's the most common choice: it handles Amharic text natively (font rendering, cursor movement, search — all fine out of the box). What it does *not* do is syntax-highlight `.ወብ` files specially — they'll show up as plain text, since there's no VS Code language extension for Diregna (that's a real, legitimate future project — a `.ወብ` TextMate grammar highlighting the `#ገጽ`/`#ዘይቤ`/`#ትእዛዝ` markers and delegating each section to HTML/CSS/JS highlighting — but it doesn't exist yet, and isn't needed to be productive today).
 
 ### Local workflow checklist
 
@@ -51,7 +51,7 @@ Steps 2–5 above are not a suggested process — they're the exact sequence thi
 ## 2. Repository Layout, and *Why* It's Shaped This Way
 
 ```
-direnya/
+diregna/
   lib/                    ← canonical source. Edit here, always.
     dictionaries.js        — pure data: every Amharic<->English mapping
     html-transpiler.js     — regex tokenizer over <tags>
@@ -252,9 +252,9 @@ The one real design question: should `ንጥሎች_በመደብ` (getElementsByC
 
 ### 6.2 Syntax highlighting — CodeMirror, and why jsdom couldn't verify it
 
-The playground's three `<textarea>` elements became CodeMirror instances (`CodeMirror.fromTextArea`), with a custom overlay mode (`CodeMirror.defineMode('direnya-js', ...)`) that layers Amharic-keyword coloring on top of CodeMirror's real JavaScript mode — real syntax (strings, numbers, operators) highlights normally underneath; the overlay only adds color to the words that are pattern-matched as Direnya keywords or built-in names.
+The playground's three `<textarea>` elements became CodeMirror instances (`CodeMirror.fromTextArea`), with a custom overlay mode (`CodeMirror.defineMode('diregna-js', ...)`) that layers Amharic-keyword coloring on top of CodeMirror's real JavaScript mode — real syntax (strings, numbers, operators) highlights normally underneath; the overlay only adds color to the words that are pattern-matched as Diregna keywords or built-in names.
 
-**A real testing dead end, worth knowing about if you extend this:** `jsdom` cannot verify CodeMirror actually renders tokenized, colored spans — CodeMirror's rendering pipeline depends on real browser layout (`getBoundingClientRect`, line-height measurement for virtual scrolling), which jsdom doesn't implement. Loading the real playground in jsdom confirms CodeMirror *initializes* (three `.CodeMirror` DOM nodes exist) but the actual line content never renders, and calling `setValue()` later crashes on a jsdom-only gap in bidi-text measurement. This is a well-known jsdom limitation, not a Direnya bug — CodeMirror is used in production across huge numbers of real sites.
+**A real testing dead end, worth knowing about if you extend this:** `jsdom` cannot verify CodeMirror actually renders tokenized, colored spans — CodeMirror's rendering pipeline depends on real browser layout (`getBoundingClientRect`, line-height measurement for virtual scrolling), which jsdom doesn't implement. Loading the real playground in jsdom confirms CodeMirror *initializes* (three `.CodeMirror` DOM nodes exist) but the actual line content never renders, and calling `setValue()` later crashes on a jsdom-only gap in bidi-text measurement. This is a well-known jsdom limitation, not a Diregna bug — CodeMirror is used in production across huge numbers of real sites.
 
 **The actual fix wasn't to give up on testing it — it was to test the right layer.** `examples/test-codemirror-overlay.js` extracts the tokenizer's matching logic (`matchWordList`/`isBoundary`) verbatim and unit-tests it standalone, with a hand-rolled stand-in for CodeMirror's `stream` object — no rendering required, because the thing that could actually have a bug is the matching algorithm, not CodeMirror's battle-tested rendering code. This is the same principle as §4.1's regex-tokenizer design: test the part you wrote, don't try to re-prove that a mature upstream library works.
 

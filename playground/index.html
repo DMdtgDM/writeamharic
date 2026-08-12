@@ -82,10 +82,15 @@
   #autosave-dot{opacity:0; transition:opacity .3s ease; font-size:.9rem; margin-right:4px;}
   #autosave-dot.show{opacity:.55;}
   @media(max-width:760px){
-    main{flex-direction:column;}
-    .editor-pane{width:100%; border-right:none; border-bottom:1px solid var(--border); height:50%;}
-    .preview-pane{height:50%;}
-  }
+  header{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; gap:8px; padding:8px 12px;}
+  header::-webkit-scrollbar{display:none;}
+  header h1{flex-shrink:0;}
+  header button, header input, .btn-theme{flex-shrink:0; white-space:nowrap;}
+  header .spacer{flex:0 0 12px;}
+  main{flex-direction:column; gap:10px; padding:10px; background:var(--bg);}
+  .editor-pane{width:100%; border-right:none; border:1px solid var(--border); border-radius:10px; overflow:hidden; height:48%; min-width:0;}
+  .preview-pane{height:48%; border:1px solid var(--border); border-radius:10px; overflow:hidden; min-width:0;}
+}
 </style>
 </head>
 <body>

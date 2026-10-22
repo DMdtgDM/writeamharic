@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ============================================================
-   ድርኛ (Diregna) — dev tool: sync-playground.js
+   ድርኛ (Direnya) — dev tool: sync-playground.js
    -------------------------------------------------------------
    playground/index.html can't use require() or fetch() sibling
    files reliably (fetch() of local files is blocked by CORS when
@@ -33,6 +33,7 @@ const PLAYGROUND = path.join(ROOT, 'playground');
 // Files that ARE synced as real sibling files (playground <script src="...">s these directly).
 const SYNCED_FILES = [
   'dictionaries.js',
+  'translit.js',
   'html-transpiler.js',
   'css-transpiler.js',
   'js-transpiler.js',

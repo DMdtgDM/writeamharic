@@ -1,5 +1,5 @@
 /* ============================================================
-   ድርኛ (Diregna) — .ወብ single-file format
+   ድርኛ (Direnya) — .ወብ single-file format
    -------------------------------------------------------------
    One file, three optional sections, marked with a line that
    starts EXACTLY with #ገጽ / #ዘይቤ / #ትእዛዝ (no space after #,

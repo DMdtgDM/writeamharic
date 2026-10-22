@@ -1,4 +1,4 @@
-# ድርኛ (Diregna) — An Amharic Language for Building Websites
+# ድርኛ (Direnya) — An Amharic Language for Building Websites
 
 **A complete design document, working implementation, and teaching guide.**
 Everything described here has been built and tested — not just planned. Code samples in this document are real, running code, copied from the actual working project.
@@ -7,7 +7,7 @@ Everything described here has been built and tested — not just planned. Code s
 
 ## 1. What This Is, In One Sentence
 
-**ድርኛ (Diregna)** lets someone write a real, working website — structure, style, and interactivity — entirely in Amharic, using words like `<ራስጌ>` instead of `<header>` and `ካሆነ` instead of `if`, which a small program then translates into the real HTML/CSS/JavaScript that every browser on Earth already understands.
+**ድርኛ (Direnya)** lets someone write a real, working website — structure, style, and interactivity — entirely in Amharic, using words like `<ራስጌ>` instead of `<header>` and `ካሆነ` instead of `if`, which a small program then translates into the real HTML/CSS/JavaScript that every browser on Earth already understands.
 
 Nothing new is invented at the browser level. Amharic goes in, standard HTML/CSS/JS comes out. This is the single most important design decision in this whole project, so it's worth explaining why before anything else.
 
@@ -20,18 +20,18 @@ There are two fundamentally different ways to make "a website builder in Amharic
 | Approach | What it means | Verdict |
 |---|---|---|
 | **A. Build a new browser/engine** that natively understands Amharic markup | Reimplement HTML parsing, CSS layout (the box model, flexbox, rendering), and a JS engine — from scratch, in Amharic | **Do not do this.** This is a multi-year, multi-person effort (browser engines are some of the most complex software that exists). It would only run in your own custom app, not the web. |
-| **B. Translate Amharic source into real HTML/CSS/JS** (a *transpiler*) | Kids write in Amharic; a small program converts it to the exact same code a professional web developer would write; a normal browser runs that | **This is what Diregna does.** A transpiler for a fixed vocabulary is a weekend-to-a-few-weeks project, not a multi-year one — and the output runs on every device that already has a browser, with zero extra software installed. |
+| **B. Translate Amharic source into real HTML/CSS/JS** (a *transpiler*) | Kids write in Amharic; a small program converts it to the exact same code a professional web developer would write; a normal browser runs that | **This is what Direnya does.** A transpiler for a fixed vocabulary is a weekend-to-a-few-weeks project, not a multi-year one — and the output runs on every device that already has a browser, with zero extra software installed. |
 
 **Approach B is what every real "localized programming language" project actually does**, including the ones that inspired this design:
 
-- **Hedy** (hedy.org) — a gradually-complex programming language, built specifically for teaching kids, that supports dozens of natural languages including Arabic, and transpiles a simplified syntax down to real Python. Its "translate keywords, keep the underlying language real" philosophy is the direct model for Diregna's JS layer.
+- **Hedy** (hedy.org) — a gradually-complex programming language, built specifically for teaching kids, that supports dozens of natural languages including Arabic, and transpiles a simplified syntax down to real Python. Its "translate keywords, keep the underlying language real" philosophy is the direct model for Direnya's JS layer.
 - **Qalb** (Arabic) and **ChhotiSi** (Hindi) — esoteric/teaching languages that translate Arabic/Hindi keywords into a real interpreter's syntax.
 - **Scratch** — sidesteps the text-translation problem entirely by using visual blocks (Scratch is localized into Amharic-adjacent languages via block *labels*, not by reinventing the engine). Worth knowing about as an alternative/complement for younger kids — see §11.
 - Ruby's creator (Matz) originally used Japanese keywords in early prototypes before settling on English for the public release — a reminder that this idea (native-language keywords over a real engine) is old and well-trodden, not experimental.
 
 **One technical fact makes the JavaScript layer of this project dramatically simpler than it would otherwise be, and it's worth stating plainly because it shapes everything downstream:**
 
-> Modern JavaScript **already allows Amharic (Ethiopic-script) letters as variable and function names.** This is not a Diregna feature — it's a basic property of the JavaScript language specification (identifiers can be any Unicode "letter" character). It was verified directly for this project:
+> Modern JavaScript **already allows Amharic (Ethiopic-script) letters as variable and function names.** This is not a Direnya feature — it's a basic property of the JavaScript language specification (identifiers can be any Unicode "letter" character). It was verified directly for this project:
 > ```js
 > let ስም = 'ሰላም';
 > function ጻፍ(x){ console.log('WROTE:', x); }
@@ -40,7 +40,7 @@ There are two fundamentally different ways to make "a website builder in Amharic
 > ```
 > This runs, unmodified, in Node.js, Chrome, Firefox, and Safari today.
 
-Because of this, Diregna's JavaScript layer does **not** need to translate variable names, function names, or most of the language. It only needs to translate the small set of *structural* keywords (`if`, `else`, a loop, a function definition, `end`) that aren't valid Amharic-as-JS on their own. Everything else — arithmetic, strings, comparisons, calling functions — is just... already Amharic, because JS lets it be. This single fact is why the JS transpiler in this project is ~140 lines instead of a few thousand.
+Because of this, Direnya's JavaScript layer does **not** need to translate variable names, function names, or most of the language. It only needs to translate the small set of *structural* keywords (`if`, `else`, a loop, a function definition, `end`) that aren't valid Amharic-as-JS on their own. Everything else — arithmetic, strings, comparisons, calling functions — is just... already Amharic, because JS lets it be. This single fact is why the JS transpiler in this project is ~140 lines instead of a few thousand.
 
 ---
 
@@ -88,7 +88,7 @@ Every box above exists as a real file in the project (see §9 for the full file 
 4. Edit any word in the left panel — Amharic or its Latin alias (§5.4) — click Run again, watch it change instantly.
 5. Save your work: **💾 አስቀምጥ** saves everything as one real `.ወብ` file (§6.5) you can reopen later with **📂 ክፈት**. When you're ready to publish: **⬇ አንድ HTML** for a single portable file, or **📦 ለሆስቲንግ ዝግጁ** for a real `index.html`/`style.css`/`script.js` set ready to upload to a static host (§6.6).
 
-The moment you download either output, **Diregna's job is done** — the result has no dependency on Diregna at all, it's just HTML/CSS/JS.
+The moment you download either output, **Direnya's job is done** — the result has no dependency on Direnya at all, it's just HTML/CSS/JS.
 
 ---
 
@@ -307,7 +307,7 @@ Input:
   የጀርባ-ቀለም: ሰማያዊ;
   ቀለም: ነጭ;
   ውስጠ-ክፍተት: 20px;
-  የጽሑፍ-አሰላለፍ: center;
+  የጽሑፍ-አሰላለፍ: መሃል;
 }
 ```
 Output:
@@ -489,15 +489,15 @@ This is a real, complete, three-file project (`examples/የመጀመሪያ-ገ�
   የጀርባ-ቀለም: ሰማያዊ;
   ቀለም: ነጭ;
   ውስጠ-ክፍተት: 24px;
-  የጽሑፍ-አሰላለፍ: center;
+  የጽሑፍ-አሰላለፍ: መሃል;
 }
 .ዋና-አዝራር {
   የጀርባ-ቀለም: ብርቱካናማ;
   ቀለም: ነጭ;
-  ድንበር: none;
+  ድንበር: ምንም;
   የድንበር-ክብነት: 8px;
   ውስጠ-ክፍተት: 12px 20px;
-  ጠቋሚ-ቅርጽ: pointer;
+  ጠቋሚ-ቅርጽ: ጠቋሚ-እጅ;
 }
 ```
 
@@ -557,7 +557,7 @@ This is implemented in `lib/web-format.js` (`parseWeb` / `serializeWeb`), tested
 
 The original single-file Download (`⬇ አንድ HTML`) inlines everything into one `.html` — great for "email it to someone" or "open it locally," not what you want to **upload to a static host**, where separate `index.html` / `style.css` / `script.js` files are the normal shape of a real site.
 
-**📦 ለሆስቲንግ ዝግጁ (ZIP)** produces exactly that: `index.html` (linking to the other two with real `<link>`/`<script src>` tags, not inlining them), `style.css`, `script.js`, and `runtime.js` (the small shim that defines `ጻፍ`/`አሳውቅ`/`አትም`). Unzip it, upload the whole folder to Vercel/Netlify/GitHub Pages/anywhere — it's a normal static site at that point, with zero remaining dependency on Diregna.
+**📦 ለሆስቲንግ ዝግጁ (ZIP)** produces exactly that: `index.html` (linking to the other two with real `<link>`/`<script src>` tags, not inlining them), `style.css`, `script.js`, and `runtime.js` (the small shim that defines `ጻፍ`/`አሳውቅ`/`አትም`). Unzip it, upload the whole folder to Vercel/Netlify/GitHub Pages/anywhere — it's a normal static site at that point, with zero remaining dependency on Direnya.
 
 The same two output shapes are available from the command line via `lib/build.js`, which now accepts either a `.ወብ` file or a project folder as input:
 
@@ -577,6 +577,18 @@ node lib/build.js my-project.ወብ output-folder --split
 
 Open `playground/index.html`. Three tabs, one Run button, one Download button. Nothing to install. This is the primary teaching tool — see §8 for a lesson plan built around it.
 
+**Keyboard shortcuts** (also shown in-app via the ⌨ button in the header):
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl`/`Cmd` + `Enter` | ▶ አሳይ — Run / refresh the preview |
+| `Ctrl`/`Cmd` + `S` | 💾 ፕሮጀክት አስቀምጥ — Save the project as a `.ወብ` file |
+| `Ctrl`/`Cmd` + `O` | 📂 ፕሮጀክት ክፈት — Open an existing project |
+| `Alt` + `1` / `2` / `3` | Switch to the ገጽ.ድር / ዘይቤ.ድር / ትእዛዝ.ድር tab |
+| `Ctrl`/`Cmd` + `/` | Comment/uncomment the current line — `#` in ትእዛዝ.ድር, `/* */` in ዘይቤ.ድር, `<!-- -->` in ገጽ.ድር (only while an editor has focus) |
+
+Tab-switching deliberately uses `Alt`+digit rather than `Ctrl`+digit — Chrome, Firefox, and Edge all reserve `Ctrl`+1 through `Ctrl`+9 at the browser level for "switch to browser tab N," and a web page cannot override that.
+
 ### 7.2 The Command-Line Build Tool (for a real multi-file project / older students)
 
 For a student who's outgrown the playground and wants a proper project folder (e.g. to put under version control, or to later extend with more pages):
@@ -591,6 +603,8 @@ my-project/
 ```bash
 node lib/build.js my-project my-project/output.html
 ```
+
+If something unexpected goes wrong (not one of the usual "missing file" cases, which already print a plain-language message), the build tool prints a short, friendly error and exits instead of dumping a raw stack trace — add `--debug` to see the full technical error underneath.
 
 Both paths run through the exact same three transpiler modules — the playground just runs them live in the browser instead of via Node, using the identical `lib/*.js` files (they're written to work in both environments unmodified — see the isomorphic module pattern at the top of each file).
 
@@ -614,14 +628,14 @@ Teach `ትእዛዝ.ድር`, `አዝራር`/`ሲነካ`, `ጻፍ()`. Goal: a but
 
 After Lesson 4, a student has touched every layer of the pipeline and can, in principle, read this entire document's Language Reference (§5) as just filling in more vocabulary on a system they already understand structurally.
 
-**Note on younger kids (roughly under 9–10):** consider Scratch *first*, and treat Diregna as the "graduation" step once a kid is comfortable with sequential instructions and wants to see real code and a real, hostable webpage. This mirrors what MIT's own research and Hedy's design explicitly recommend — block-based tools remove syntax-error frustration for the very newest learners; text-based tools become more motivating once a learner wants their work to look and feel like "real programming." Forcing a 7-year-old straight into typed syntax (Amharic or not) fights the tool against the age group rather than for it.
+**Note on younger kids (roughly under 9–10):** consider Scratch *first*, and treat Direnya as the "graduation" step once a kid is comfortable with sequential instructions and wants to see real code and a real, hostable webpage. This mirrors what MIT's own research and Hedy's design explicitly recommend — block-based tools remove syntax-error frustration for the very newest learners; text-based tools become more motivating once a learner wants their work to look and feel like "real programming." Forcing a 7-year-old straight into typed syntax (Amharic or not) fights the tool against the age group rather than for it.
 
 ---
 
 ## 9. Where Everything Lives (Project Structure)
 
 ```
-diregna/
+direnya/
   lib/
     dictionaries.js        ← every Amharic<->real-word mapping (+ Latin aliases), single source of truth
     html-transpiler.js     ← translates ገጽ.ድር → real HTML
@@ -658,33 +672,45 @@ This section exists because a design document that only lists strengths isn't tr
 **Scoping is intentionally narrow — and that's correct for now.**
 About 55 HTML tags/attributes, ~25 CSS properties, and 9 JS structural keywords are covered. This is enough for the entire teaching curriculum in §8 and for genuinely useful static pages. It is **not** enough for arbitrary modern web development (no `grid`, no `async`, no classes/`this`, no modules). That's fine — the goal is a first-language teaching tool with a real, honest ceiling, not a full web-dev framework. When a student outgrows it, they've also outgrown the "training wheels" framing entirely and are ready for real HTML/CSS/JS with English keywords — which, not coincidentally, is now nearly identical to what they already know, since the underlying language never changed.
 
-**The HTML transpiler is regex-based, not a real parser.**
-This was a deliberate simplicity-over-robustness tradeoff, and it has a real limit: it assumes reasonably well-formed, simple tag/attribute syntax. It will **not** correctly handle deeply pathological input — e.g. a `>` character inside an unquoted attribute value, or malformed/unclosed tags in complex combinations. For the MVP's audience (kids typing straightforward markup) this is a non-issue in practice, and it was tested against realistic nested markup successfully (§5.1). If this becomes a real problem later, the fix is swapping the regex tokenizer for a proper small parser (e.g. using a library like `parse5`) behind the exact same `transpileHTML(source) → {html, warnings}` interface — nothing downstream would need to change.
+**The HTML transpiler used to be regex-based — now a real tokenizer.**
+This was originally a deliberate simplicity-over-robustness tradeoff, with a real, confirmed limit: any `<`/`>` used as ordinary text (e.g. a student writing a math comparison like `x<5 and y>10` in a paragraph) got misread as a fake tag, producing a confusing "Unknown tag" warning for text that was never markup. Fixed by replacing the regex pass with a small hand-written character-by-character tokenizer: `<` now only starts a tag when immediately followed by a letter (or `/`+letter, or `<!--`), matching how a real HTML parser decides where a tag begins — everything else (quoted attribute values containing `<`/`>`, nested well-formed markup, comments, self-closing tags) behaves exactly as before. Same external interface (`transpileHTML(source) → {html, warnings}`), so nothing downstream changed. Covered by `examples/test-html-tokenizer.js`.
 
-**The JS "variable scope" is intentionally flattened.**
-`js-transpiler.js` tracks "have I seen this name before" with one flat `Set` for the whole file, not real per-function scoping. This means: if a student picks the *same* variable name inside two different `ተግባር` blocks, the second occurrence won't get its own `let` — it'll just be treated as reassignment, which is silently wrong if they intended two separate local variables. This was tested and confirmed to work fine for the flat, short teaching programs in the curriculum (functions with clearly distinct variable names), but is a known correctness gap for more advanced use. This is the single highest-priority item in the roadmap below.
+**CSS comments weren't actually opaque to the transpiler — now fixed.**
+Two real bugs: a bare Amharic tag word inside a `/* ... */` comment (e.g. `/* styles for ራስጌ section */`) got silently mistranslated by the selector-tag pass, and a commented-out declaration (e.g. `/* ቀለም: ሰማያዊ; */`) got translated by the property/value pass — even though comments are supposed to be completely inert, same as in real CSS. Fixed by extracting every comment into a placeholder before either translation pass runs, then restoring the original text byte-for-byte at the end. Covered by `examples/test-css-comments.js`.
+
+**The JS "variable scope" was intentionally flattened — now fixed properly (twice).**
+`js-transpiler.js` used to track "have I seen this name before" with one flat `Set` for the whole file, not real per-function scoping. That meant if a student picked the *same* variable name inside two different `ተግባር` blocks, the second occurrence wouldn't get its own `var` — it'd silently leak as a global instead of being its own local variable. A first fix gave each `ተግባር` its own declared-names scope (a stack of `Set`s, pushed on `ተግባር`, popped on its matching `ጨርስ`) — but that fix only checked the CURRENT function's own scope, which introduced a second, worse bug: reassigning an already-existing OUTER variable from inside a function — `ብዛት = ብዛት + 1` inside a click handler, exactly the pattern in the bundled counter example — silently declared a brand-new, shadowing local instead of updating the real one, so the local's own uninitialized value was read on the right-hand side and the counter produced `NaN` forever, with no warning anywhere. Now fixed for real: assignment checks every ENCLOSING scope (not just the innermost) before deciding a name is new, so a name already declared anywhere outward is reused via normal closure, and only a genuinely new name gets its own `var`. Covered by `examples/test-js-closure.js` (6 checks, including running the transpiled counter and confirming it actually counts 1, 2, 3 instead of NaN, NaN, NaN) and an updated `examples/test-js-function-scope.js` (its old Test 4 asserted the *wrong* behavior — real JS `var`-shadowing semantics — for a DSL where "a name always means the same variable" is the far less surprising rule for a beginner).
+
+**Inline anonymous function callbacks silently produced broken JS — now warned instead.**
+`ስማ(አዝራር, "ጠቅታ", ተግባር()` opening a multi-line `ጨርስ`-closed block as an inline callback argument isn't a shape this line-based transpiler can parse (`ተግባር` only works as a standalone, named, own-line declaration) — it used to fall through silently and emit mismatched-parenthesis, invalid JS with zero warnings, breaking the whole script's execution with no clue why. Now detected and flagged with a specific warning that names the two things that actually work: define a named `ተግባር` first and pass it by reference (the pattern the bundled example already uses), or write a real one-line `() => { ... }` arrow function, which already worked and still does — the DSL never needed to touch real JS syntax to leave it functioning.
 
 **No error line-highlighting yet.**
 Warnings report a line number in a monospace text message, not a red squiggle in the editor. Fine for an MVP; a real syntax-highlighting code editor (CodeMirror or Monaco) is the natural upgrade — see roadmap.
 
-**Attribute value translation is deliberately *not* done.**
-E.g. `<ማስገቢያ ዓይነት="text">` — the word `text` here is a real HTML input type and is left as English on purpose, because translating enum-like values (`text`, `email`, `checkbox`...) would require a much bigger dictionary of *value* vocabularies per attribute, with real risk of ambiguity (is this string a value to translate, or the student's own data?). This is a real limitation students will hit as soon as they try to build an actual form — worth flagging clearly in Lesson 4+ rather than pretending it doesn't exist.
+**Build failures used to fail silently (Playground) or with a raw stack trace (CLI) — now fixed.**
+If a transpiler ever threw instead of returning a warning, the Playground preview used to just freeze with zero feedback — the worst possible outcome for a beginner. `showPreviewForPage` now catches that, keeps showing the *last successful* preview instead of blanking it, and surfaces a clear message in the warnings box plus a toast. A global `window.onerror`/`unhandledrejection` handler also catches anything unexpected elsewhere in the app (file handling, asset upload) so nothing fails completely silently. On the CLI side, `lib/build.js` now catches anything not already covered by its specific, friendly error messages and prints a short one-line explanation instead of a raw Node stack trace — pass `--debug` to see the full trace when you actually need it.
+
+**Attribute value translation — now done for the one attribute where it mattered most.**
+`<ማስገቢያ ዓይነት="...">` (input `type`) now has its own small, fixed value dictionary (`ATTR_VALUES` in `dictionaries.js`, ~17 entries + Latin aliases: `ኢሜይል`→`email`, `ቁጥር`→`number`, `ማረጋገጫ-ሳጥን`→`checkbox`, `ቀን`→`date`, etc.). It only fires on an **exact, whole-value match** for `type` specifically — never a substring, and never for any other attribute — so a student's own placeholder text, labels, or URLs are never at risk of being silently rewritten. This was the single most common wall a student would hit building their first real form, so it's fixed now rather than deferred. Every *other* attribute value (`href`, `src`, `value`, `placeholder`, …) is still left completely untouched on purpose — those are genuinely free-form content, not a closed vocabulary, and translating them would risk exactly the ambiguity this design has always avoided. Covered by `examples/test-attr-values.js` (5 checks, including a non-exact-match case that must be left alone).
 
 ---
 
 ## 11. Roadmap
 
 **Immediate next technical priorities** (in priority order, based on §10):
-1. Real per-function variable scoping in the JS transpiler (currently flat) — still the highest-priority known gap.
-2. Swap the HTML regex tokenizer for a real lightweight parser once content gets more complex than the teaching curriculum needs.
+1. ~~Real per-function variable scoping in the JS transpiler (currently flat)~~ — **done.**
+2. ~~Swap the HTML regex tokenizer for a real lightweight parser~~ — **done.** A hand-written character-by-character tokenizer, fixing the "math comparison misread as a tag" bug — see §10.
 3. ~~Syntax highlighting in the playground editor~~ — **done.** CodeMirror, with a custom overlay mode for both Amharic and Latin keywords, falling back to plain text if offline.
-4. A `.ወብ` syntax file for VS Code (highlighting `#ገጽ`/`#ዘይቤ`/`#ትእዛዝ` markers and delegating to HTML/CSS/JS highlighting inside each section) — doesn't exist yet; the playground's own editor is the only place `.ወብ` content currently gets highlighted.
+4. ~~CSS comments not actually opaque to the transpiler~~ — **done** — see §10.
+5. ~~Editor keyboard shortcuts~~ — **done.** Run/Save/Open, tab switching, and comment-toggle — see §7.1.
+6. ~~Build-failure error handling and feedback (Playground + CLI)~~ — **done** — see §10.
+7. A `.ወብ` syntax file for VS Code (highlighting `#ገጽ`/`#ዘይቤ`/`#ትእዛዝ` markers and delegating to HTML/CSS/JS highlighting inside each section) — doesn't exist yet; the playground's own editor is the only place `.ወብ` content currently gets highlighted. Now the highest-priority known gap.
 
 **Feature roadmap:**
 - **Phase 2 — richer JS:** ~~more control flow (`ወይም` for elif-style chains)~~ — **done.** Still open: arrays/list built-ins with Amharic method names, more math helpers.
 - ~~DOM access & control~~ — **done.** 11 built-ins (§5.3) for finding elements, reading/writing text and values, styling, classes, and event listeners — this is what turns a page from "write once" into genuinely interactive.
 - ~~Typing without an Amharic keyboard~~ — **done** for the language's own vocabulary (§5.4). Explicitly still open: a general Amharic transliteration input method for free-form *content* text — a materially bigger, different project, not attempted here.
-- **Phase 3 — one-click real publishing:** §6.6 covers "download a real, upload-ready set of files" — that part is done. What's still missing is the *upload* itself: a logged-in student clicking "አሳትም" (Publish) and getting a real hosted URL immediately — e.g. `student-name.diregna.et` — with no separate trip to Vercel/Netlify. That needs simple static file storage behind it (this reuses the exact same Supabase Storage + static hosting pattern already specified in the Simplexer platform's own SRS, §14 of that document — same infrastructure, no new backend paradigm needed).
+- **Phase 3 — one-click real publishing:** §6.6 covers "download a real, upload-ready set of files" — that part is done. What's still missing is the *upload* itself: a logged-in student clicking "አሳትም" (Publish) and getting a real hosted URL immediately — e.g. `student-name.direnya.et` — with no separate trip to Vercel/Netlify. That needs simple static file storage behind it (this reuses the exact same Supabase Storage + static hosting pattern already specified in the Simplexer platform's own SRS, §14 of that document — same infrastructure, no new backend paradigm needed).
 - **Phase 4 — Simplexer integration:** ship this as a new **Interest Track course** ("የድር ገጽ አሠራር በአማርኛ" — "Building Webpages in Amharic") inside the existing Simplexer platform (see the separate Simplexer SRS), using the playground as an embedded lesson type alongside video/text lessons — the natural home for this project, per your original framing.
 
 **Explicitly out of scope, on purpose:** a full Amharic programming language for general-purpose (non-web) programming; a from-scratch rendering engine; support for the entire modern HTML/CSS/JS surface area; a general Amharic transliteration typing system. All would trade a working, honest teaching tool today for a much bigger, likely-unfinished project.
@@ -714,4 +740,4 @@ Every one of the following was actually executed against the real code in this p
 
 ## 13. Naming Note
 
-"ድርኛ" (Diregna) combines **ድር** (*dir* — "web," as in ድር-ገጽ, "web-page") with the **-ኛ** suffix pattern used for "one who does/makes" — read loosely as "web-maker" or "the web, in [our] own language." Two alternates considered, in case this name doesn't stick with the people you test it on: **ገጽኛ** (Getsenya — "page-maker") and **ኢትዮ-ድር** (Ethio-Dir — more literal, less elegant). Worth testing all three on an actual group of kids before locking one in — naming is cheap to change now and expensive to change after it's on a certificate or a URL.
+"ድርኛ" (Direnya) combines **ድር** (*dir* — "web," as in ድር-ገጽ, "web-page") with the **-ኛ** suffix pattern used for "one who does/makes" — read loosely as "web-maker" or "the web, in [our] own language." Two alternates considered, in case this name doesn't stick with the people you test it on: **ገጽኛ** (Getsenya — "page-maker") and **ኢትዮ-ድር** (Ethio-Dir — more literal, less elegant). Worth testing all three on an actual group of kids before locking one in — naming is cheap to change now and expensive to change after it's on a certificate or a URL.

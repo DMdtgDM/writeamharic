@@ -345,24 +345,5 @@
     "ወደ_እቃ": "wede_iqa",             // JSON.parse
   };
 
-  // ---- auto Latin spellings ----
-  // Every Amharic tag / attribute / CSS property that has no Latin twin yet also works when typed the way it SOUNDS
-  // in Latin letters (ሰውነት = "sewenet"). Hand-written aliases above always win; we never overwrite or shadow a real name.
-  (function addLatinSpellings() {
-    let TR = null;
-    try { TR = (typeof require === 'function') ? require('./translit.js') : (typeof self !== 'undefined' ? self.DIRENYA_TRANSLIT : null); } catch (e) { TR = (typeof self !== 'undefined' ? self.DIRENYA_TRANSLIT : null); }
-    if (!TR || !TR.spell) return;
-    [TAGS, ATTRS, CSS_PROPS].forEach(table => {
-      const real = new Set(Object.values(table));
-      Object.keys(table).forEach(k => {
-        if (!/[\u1200-\u137F]/.test(k)) return;
-        const lat = TR.spell(k).toLowerCase();
-        if (!lat || lat.length < 2 || !/^[a-z][a-z0-9_-]*$/.test(lat)) return;
-        if (Object.prototype.hasOwnProperty.call(table, lat) || real.has(lat)) return;
-        table[lat] = table[k];
-      });
-    });
-  })();
-
   return { TAGS, ATTRS, ATTR_VALUES, CSS_PROPS, CSS_COLOR_VALUES, JS_KEYWORD_ALIASES, RUNTIME_ALIASES };
 });

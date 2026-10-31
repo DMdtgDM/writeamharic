@@ -90,12 +90,12 @@
   .tab-content.active{display:flex;}
   textarea{
     flex:1; width:100%; background:var(--bg); color:var(--text); border:none; resize:none;
-    font-family:'Fira Code', monospace; font-size:var(--code-fs,14px); line-height:1.6; padding:14px; outline:none;
+    font-family:'Fira Code', monospace; font-size:14px; line-height:1.6; padding:14px; outline:none;
   }
   /* CodeMirror: match the playground's own dark theme instead of pulling in a separate theme file */
   .CodeMirror{
     height:100%; background:var(--bg); color:var(--text);
-    font-family:'Fira Code', monospace; font-size:var(--code-fs,14px); line-height:1.6;
+    font-family:'Fira Code', monospace; font-size:14px; line-height:1.6;
   }
   .CodeMirror-gutters{background:var(--panel); border-right:1px solid var(--border);}
   .CodeMirror-linenumber{color:var(--muted); opacity:.6;}
@@ -118,17 +118,6 @@
   body .CodeMirror .cm-direnya-keyword{color:var(--cm-keyword); font-weight:600;}   /* ካሆነ/ጨርስ/ወይም/ድገም/ተግባር/... */
   body .CodeMirror .cm-direnya-builtin{color:var(--cm-builtin); font-weight:600;}   /* ጻፍ/አሳውቅ/አትም */
   .preview-pane{flex:1; display:flex; flex-direction:column; min-width:280px;}
-  /* drag bar between the code and the preview: drag it to give one side more room (double-click = reset) */
-  #split-handle{flex:none; width:10px; margin:0 -5px; position:relative; z-index:6; cursor:col-resize; touch-action:none; background:transparent;}
-  #split-handle::after{content:''; position:absolute; top:50%; left:3px; width:4px; height:46px; margin-top:-23px; border-radius:3px; background:var(--border); transition:background .15s;}
-  #split-handle:hover::after, #split-handle:focus-visible::after, body.dragging-split #split-handle::after{background:var(--secondary);}
-  #split-handle:focus-visible{outline:none;}
-  body.dragging-split{cursor:col-resize; user-select:none;}
-  body.dragging-split iframe{pointer-events:none;}
-  .zoom-ctl{margin-left:auto; display:flex; align-items:center; gap:3px; padding:0 8px; flex:none;}
-  .zoom-ctl button{padding:1px 7px; font-size:.78rem; border-radius:6px; background:transparent; color:var(--muted); border:1px solid var(--border);}
-  .zoom-ctl button:hover{color:var(--text); border-color:var(--secondary);}
-  .zoom-ctl .zoom-val{font-size:.7rem; color:var(--muted); min-width:2.4em; text-align:center;}
   .preview-head{background:var(--panel); border-bottom:1px solid var(--border); padding:8px 14px; font-size:.78rem; color:var(--muted); display:flex; justify-content:space-between; align-items:center;}
   iframe{flex:1; border:none; background:#fff;}
   /* device preview: the page renders at the device's REAL width (so media queries behave) and is scaled down to fit the pane */
@@ -194,8 +183,6 @@
   body .CodeMirror-hints{background:var(--panel); border:1px solid var(--border); border-radius:10px; box-shadow:0 12px 32px rgba(0,0,0,.5); padding:4px; max-height:17em; z-index:400; font-family:inherit;}
   body .CodeMirror-hints .CodeMirror-hint{display:flex; align-items:baseline; gap:10px; min-width:210px; padding:5px 10px; border-radius:6px; color:var(--text); font-size:.92rem; line-height:1.35; white-space:nowrap;}
   body .CodeMirror-hints .CodeMirror-hint .hint-w{font-weight:600; flex:1;}
-  body .CodeMirror-hints .CodeMirror-hint .hint-l{font-family:'Fira Code',monospace; font-size:.76rem; opacity:.7; margin-left:8px;}
-  body .CodeMirror-hints li.CodeMirror-hint-active .hint-l{color:var(--on-secondary); opacity:.85;}
   body .CodeMirror-hints .CodeMirror-hint .hint-g{font-size:.74rem; color:var(--muted);}
   body .CodeMirror-hints .CodeMirror-hint .hint-b{font-size:.62rem; font-weight:700; padding:0 5px; border:1px solid var(--cm-keyword); color:var(--cm-keyword); border-radius:4px;}
   body .CodeMirror-hints li.CodeMirror-hint-active{background:var(--secondary); color:var(--on-secondary);}
@@ -208,7 +195,7 @@
   #js-panel{display:none; margin:0; max-height:160px; overflow:auto; padding:8px 14px; font-family:'Fira Code',monospace; font-size:.76rem; background:var(--panel); color:var(--text); border-top:1px solid var(--border); white-space:pre-wrap;}
   @media(max-width:760px){
     main{flex-direction:column;}
-    .editor-pane{width:100% !important; border-right:none; border-bottom:1px solid var(--border); height:50%;}
+    .editor-pane{width:100%; border-right:none; border-bottom:1px solid var(--border); height:50%;}
     .preview-pane{height:50%;}
     header{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; gap:8px; padding:8px 10px;}
     header::-webkit-scrollbar{height:4px;}
@@ -222,7 +209,6 @@
     #mobile-tabs{display:flex !important;}
     #run-fab{display:flex !important;}
     .dev-btn[data-w]{display:none;}
-    #split-handle{display:none;}
   }
   #mobile-tabs{display:none; background:var(--panel); border-top:1px solid var(--border); padding-bottom:env(safe-area-inset-bottom,0px);}
   #mobile-tabs button{flex:1; padding:12px 0; font-size:.95rem; background:transparent; color:var(--muted); border:none; border-top:3px solid transparent;}
@@ -273,7 +259,6 @@
       <div class="tab active" data-tab="html" id="tab-html-label">ገጽ.ድር <span style="opacity:.6">(HTML)</span></div>
       <div class="tab" data-tab="css">ዘይቤ.ድር <span style="opacity:.6">(CSS, shared)</span></div>
       <div class="tab" data-tab="js">ትእዛዝ.ድር <span style="opacity:.6">(JS, shared)</span></div>
-      <span class="zoom-ctl" title="የኮድ መጠን (code size) — Ctrl/Cmd + / − / 0"><button onclick="changeCodeSize(-1)" aria-label="smaller">A−</button><span class="zoom-val" id="zoom-val"></span><button onclick="changeCodeSize(1)" aria-label="bigger">A+</button></span>
     </div>
     <div class="page-bar" id="page-bar"></div>
     </div>
@@ -282,7 +267,6 @@
     <div class="tab-content" data-tab="js"><textarea id="src-js" spellcheck="false"></textarea></div>
     <div id="code-bar" role="toolbar" aria-label="ኮድ ቁልፎች (code keys)"></div>
   </div>
-  <div id="split-handle" role="separator" aria-orientation="vertical" tabindex="0" title="ጎትት — ኮዱንና ውጤቱን መጠን ለመቀየር (drag to resize · double-click to reset)"></div>
 
   <div class="preview-pane">
     <div class="preview-head"><span>ውጤት (Preview) — <span id="preview-page-label">ገጽ</span></span><span style="display:flex;align-items:center;gap:6px;"><span id="device-label"></span><button class="dev-btn" data-w="375" onclick="setDevice(375)" title="ስልክ (phone)">📱</button><button class="dev-btn" data-w="768" onclick="setDevice(768)" title="ታብሌት (tablet)">▭</button><button class="dev-btn active" data-w="" onclick="setDevice(0)" title="ሙሉ (full width)">🖥</button><button class="dev-btn" onclick="toggleJsPanel()" title="JavaScript አሳይ (show the JavaScript)">&lt;/&gt;</button><span class="page-add-btn" id="preview-reset-btn" style="display:none;" onclick="resetPreviewToEditor()">↺ ወደ አርታኢው ገጽ</span><span id="status">●</span></span></div>
@@ -307,7 +291,6 @@
       <tr><td><kbd>Alt</kbd>+<kbd>1</kbd></td><td>ገጽ.ድር tab (HTML)</td></tr>
       <tr><td><kbd>Alt</kbd>+<kbd>2</kbd></td><td>ዘይቤ.ድር tab (CSS)</td></tr>
       <tr><td><kbd>Alt</kbd>+<kbd>3</kbd></td><td>ትእዛዝ.ድር tab (JS)</td></tr>
-      <tr><td><kbd>Ctrl/Cmd</kbd>+<kbd>+</kbd> / <kbd>−</kbd> / <kbd>0</kbd></td><td>🔍 Code text bigger / smaller / reset (while an editor is focused; also Ctrl + mouse wheel)</td></tr>
       <tr><td><kbd>Ctrl/Cmd</kbd>+<kbd>/</kbd></td><td>Comment / uncomment the current line (while an editor is focused)</td></tr>
     </table>
     <button class="modal-close" onclick="hideShortcutsModal()">ዝጋ (Close)</button>
@@ -338,8 +321,8 @@
 <link rel="stylesheet" href="vendor/show-hint.min.css">
 
 <!-- ===== Transpiler engine (same files as lib/, inlined for zero-setup use) ===== -->
-<script src="translit.js"></script>
 <script src="dictionaries.js"></script>
+<script src="translit.js"></script>
 <script src="html-transpiler.js"></script>
 <script src="css-transpiler.js"></script>
 <script src="js-transpiler.js"></script>
@@ -475,12 +458,6 @@ document.addEventListener('keydown', function(e){
     hideThemeModal(); return;
   }
   const mod = e.ctrlKey || e.metaKey;
-  if(mod && !e.altKey && e.target && e.target.closest && e.target.closest('.editor-pane')){
-    // code text size — only while the cursor is in the code, so the browser's own page zoom still works everywhere else
-    if(e.key === '+' || e.key === '=' ){ e.preventDefault(); changeCodeSize(1); return; }
-    if(e.key === '-' || e.key === '_'){ e.preventDefault(); changeCodeSize(-1); return; }
-    if(e.key === '0'){ e.preventDefault(); changeCodeSize(0); return; }
-  }
   if(mod){
     const key = e.key.toLowerCase();
     if(key === 'enter'){ e.preventDefault(); runProgram(); return; }
@@ -520,6 +497,41 @@ document.querySelectorAll('.tab').forEach(tab=>{
 const cmInstances = {}; // { html: CodeMirror|null, css: ..., js: ... }
 
 const assetStore = new Map();
+
+/* ---------- photos/videos survive closing the tab (IndexedDB) ----------
+   assetStore is only memory, so before this a refresh made every <ምስል>
+   point at a file that no longer existed. Every upload is now also kept in
+   the browser's IndexedDB and put back before the first preview runs.
+   (A saved .ወብ file embeds the same files too — see saveWebFile.) */
+function idbOpen(){
+  return new Promise((res, rej)=>{
+    try{
+      const r = indexedDB.open('direnya-assets', 1);
+      r.onupgradeneeded = ()=> r.result.createObjectStore('files');
+      r.onsuccess = ()=> res(r.result);
+      r.onerror = ()=> rej(r.error);
+    }catch(e){ rej(e); }
+  });
+}
+async function persistAsset(name, file){
+  try{
+    const db = await idbOpen();
+    db.transaction('files','readwrite').objectStore('files').put(file, name);
+  }catch(e){ console.warn('Could not keep the file for next time:', e); }
+}
+async function loadPersistedAssets(){
+  try{
+    const db = await idbOpen();
+    await new Promise(res=>{
+      const req = db.transaction('files').objectStore('files').openCursor();
+      req.onsuccess = ()=>{
+        const c = req.result;
+        if(c){ if(!assetStore.has(c.key)) assetStore.set(c.key, c.value); c.continue(); } else res();
+      };
+      req.onerror = ()=> res();
+    });
+  }catch(e){ /* private mode etc. — just start empty */ }
+}
 
 // Avoids silently overwriting a previous "foto.jpg" with a new upload —
 // each upload gets a name guaranteed not to collide with what's already
@@ -645,6 +657,7 @@ function deletePage(name){
 // tool still opens correctly, with its one page becoming home.
 const PAGE_SECTION_RE = /^#ገጽ(?::(\S+))?\s*$/;
 const SHARED_SECTION_RE = /^#(ዘይቤ|ትእዛዝ)\s*$/;
+const ASSET_SECTION_RE = /^#ንብረት:(\S+)\s*$/;
 
 function serializeProject(){
   pages[currentPageName] = getSrc('html');
@@ -661,10 +674,22 @@ function serializeProject(){
   return parts.join('\n\n') + '\n';
 }
 
+// Same text as serializeProject(), plus every photo/video the project
+// uses, embedded as a data: URI — so the saved .ወብ is self-contained.
+async function serializeProjectWithAssets(){
+  let out = serializeProject();
+  const used = [...assetStore].filter(([name]) => out.includes(name));
+  for(const [name, file] of used){
+    out += '\n#ንብረት:' + name + '\n' + await fileToDataUri(file) + '\n';
+  }
+  return { text: out, count: used.length };
+}
+
 function parseProjectFile(source){
   const lines = source.split('\n');
   const parsedPages = {};
   const cssParts = [], jsParts = [];
+  const assets = {};
   let current = { type: 'page', name: HOME_PAGE };
   let buffer = [];
   let sawAnyMarker = false;
@@ -677,6 +702,8 @@ function parseProjectFile(source){
       cssParts.push(text);
     } else if(current.type === 'js' && text){
       jsParts.push(text);
+    } else if(current.type === 'asset' && text){
+      assets[current.name] = text.replace(/\s+/g, '');
     }
     buffer = [];
   }
@@ -685,6 +712,8 @@ function parseProjectFile(source){
     const trimmed = line.trim();
     const pm = PAGE_SECTION_RE.exec(trimmed);
     const sm = SHARED_SECTION_RE.exec(trimmed);
+    const am = ASSET_SECTION_RE.exec(trimmed);
+    if(am){ flush(); current = { type: 'asset', name: am[1] }; sawAnyMarker = true; continue; }
     if(pm){ flush(); current = { type: 'page', name: pm[1] || HOME_PAGE }; sawAnyMarker = true; continue; }
     if(sm){ flush(); current = { type: sm[1] === 'ዘይቤ' ? 'css' : 'js' }; sawAnyMarker = true; continue; }
     buffer.push(line);
@@ -698,7 +727,7 @@ function parseProjectFile(source){
   }
   if(!parsedPages[HOME_PAGE]) parsedPages[HOME_PAGE] = '';
 
-  return { pages: parsedPages, css: cssParts.join('\n\n'), js: jsParts.join('\n\n'), hadExplicitSections: sawAnyMarker };
+  return { pages: parsedPages, css: cssParts.join('\n\n'), js: jsParts.join('\n\n'), hadExplicitSections: sawAnyMarker, assets };
 }
 
 function getSrc(tab){
@@ -776,6 +805,7 @@ function handlePhotoUpload(event){
 
   const filename = uniqueAssetName(file.name);
   assetStore.set(filename, file);
+  persistAsset(filename, file);
 
   // The HTML source now gets a plain, short, portable filename —
   // exactly what a learner would write by hand for a real hosted page.
@@ -810,6 +840,7 @@ function handleVideoUpload(event){
 
   const filename = uniqueAssetName(file.name);
   assetStore.set(filename, file);
+  persistAsset(filename, file);
 
   const tag = `<ቪዲዮ ምንጭ="${filename}" ቁጥጥሮች>\n  ብራውዘርዎ ቪዲዮ አይደግፍም።\n</ቪዲዮ>\n`;
   switchToTab('html');
@@ -1371,32 +1402,17 @@ function buildNavInterceptScript(){
     var PAGES = ${JSON.stringify(map)};
     document.addEventListener('click', function(e){
       var a = e.target.closest && e.target.closest('a[href]');
-      if(!a || e.defaultPrevented) return;
+      if(!a) return;
       var href = a.getAttribute('href');
-      // 1) a link to another page of this project -> swap the preview
       if(Object.prototype.hasOwnProperty.call(PAGES, href)){
         e.preventDefault();
         parent.postMessage({ type: 'direnya-navigate', page: PAGES[href] }, '*');
-        return;
-      }
-      // 2) a link to a spot on THIS page (#section) -> scroll there ourselves (the sandboxed preview can't do it natively)
-      if(href.charAt(0) === '#' && href.length > 1){
-        e.preventDefault();
-        var id = href.slice(1); try{ id = decodeURIComponent(id); }catch(_){}
-        var t = document.getElementById(id) || document.getElementsByName(id)[0];
-        if(t && t.scrollIntoView) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        return;
-      }
-      // 3) a real website / email / phone link -> the preview is sandboxed and most sites refuse to load inside it, so open it in a new tab
-      if(/^(https?:)?\\/\\//i.test(href) || /^(mailto|tel):/i.test(href)){
-        e.preventDefault();
-        parent.postMessage({ type: 'direnya-open', url: a.href }, '*');
       }
     }, true);
   })();<\/script>`;
 }
 
-function buildFullHtmlForPage(name, forPreview, sandboxed){
+function buildFullHtmlForPage(name, forPreview){
   // Whichever page is currently open in the editor should reflect
   // live, unsaved edits; every other page renders from its last-saved
   // source in `pages`.
@@ -1422,7 +1438,7 @@ function buildFullHtmlForPage(name, forPreview, sandboxed){
   } else {
     out = injectBeforeBodyClose(out, `<script>${RUNTIME_JS}\n${js}<\/script>`);
   }
-  if(forPreview || sandboxed) out = injectBeforeBodyClose(out, buildNavInterceptScript());
+  out = injectBeforeBodyClose(out, buildNavInterceptScript());
   if(!/<!doctype/i.test(out)) out = '<!DOCTYPE html>\n'+out;
 
   return { fullHtml: out, warnings };
@@ -1516,19 +1532,6 @@ window.addEventListener('message', (event)=>{
   showPreviewForPage(data.page); // simulated navigation — doesn't touch the editor's currentPageName
 });
 
-// links to real websites / email / phone from inside the sandboxed preview: open them in a new tab
-window.addEventListener('message', (event)=>{
-  const data = event.data;
-  if(!data || data.type !== 'direnya-open' || event.source === window) return;
-  let u; try{ u = new URL(String(data.url)); }catch(err){ return; }
-  if(u.protocol === 'http:' || u.protocol === 'https:'){
-    window.open(u.href, '_blank', 'noopener,noreferrer');
-    showToast('↗ ' + u.hostname + ' — በአዲስ ትር ተከፈተ (opened in a new tab)');
-  } else if(u.protocol === 'mailto:' || u.protocol === 'tel:'){
-    window.location.href = u.href;
-  }
-});
-
 async function runProgram(){
   pages[currentPageName] = getSrc('html');
   await showPreviewForPage(currentPageName);
@@ -1557,24 +1560,29 @@ function showToast(msg, isError){
 }
 
 /* ---------- .ወብ open / save (single real file, three sections) ---------- */
-function saveWebFile(){
-  const source = serializeProject();
+async function saveWebFile(){
+  const { text: source, count: nAssets } = await serializeProjectWithAssets();
   const blob = new Blob([source], {type:'text/plain;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'የእኔ-ፕሮጀክት.ወብ';
   a.click();
   const n = Object.keys(pages).length;
-  showToast(`✓ ፕሮጀክት ተቀምጧል (${n} ገጽ${n > 1 ? 'ች' : ''})`);
+  showToast(`✓ ፕሮጀክት ተቀምጧል (${n} ገጽ${n > 1 ? 'ች' : ''}${nAssets ? ` + ${nAssets} ፎቶ/ቪዲዮ` : ''})`);
 }
 
 function openWebFile(event){
   const file = event.target.files[0];
   if(!file) return;
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     try{
-      const { pages: newPages, css, js, hadExplicitSections } = parseProjectFile(reader.result);
+      const { pages: newPages, css, js, hadExplicitSections, assets: embedded } = parseProjectFile(reader.result);
+      for(const [name, uri] of Object.entries(embedded || {})){
+        const blob = await (await fetch(uri)).blob();
+        const f = new File([blob], name, { type: blob.type });
+        assetStore.set(name, f); persistAsset(name, f);
+      }
       pages = newPages;
       if(!pages[HOME_PAGE]) pages[HOME_PAGE] = ''; // always guarantee a home page exists
       currentPageName = HOME_PAGE;
@@ -1785,7 +1793,7 @@ async function openFromHash(){
   }catch(e){ console.warn('bad share link',e); showToast('✗ ሊንኩ ተበላሽቷል (invalid share link)',true); return false; }
 }
 function showViewer(st){
-  const { fullHtml } = buildFullHtmlForPage(HOME_PAGE, false, true);
+  const { fullHtml } = buildFullHtmlForPage(HOME_PAGE);
   const ov=document.createElement('div'); ov.style.cssText='position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;background:#fff';
   const bar=document.createElement('div'); bar.style.cssText='background:var(--panel);color:var(--text);padding:8px 14px;display:flex;gap:10px;align-items:center;font-size:.85rem';
   bar.innerHTML='<span style="flex:1">ድ በድርኛ የተሠራ ገጽ (made with Direnya)</span>';
@@ -1824,7 +1832,6 @@ function direnyaWords(tab,cm){
 // each suggestion row: the Amharic word, its English meaning on the right, and a small "block" badge for templates
 function renderHint(el, self, data){
   const w=document.createElement('span'); w.className='hint-w'; w.textContent=data.word; el.appendChild(w);
-  if(data.latin){ const l=document.createElement('span'); l.className='hint-l'; l.textContent=data.latin; el.appendChild(l); }   // how to type the Amharic word in Latin letters
   if(data.snip){ const b=document.createElement('span'); b.className='hint-b'; b.textContent='ብሎክ'; el.appendChild(b); }
   if(data.gloss){ const g=document.createElement('span'); g.className='hint-g'; g.textContent=data.gloss; el.appendChild(g); }
 }
@@ -1842,14 +1849,7 @@ function direnyaHint(cm){
     else if(e.gloss&&e.gloss.toLowerCase().startsWith(low)) score=5;
     if(score<0||(e.w===typed&&!e.snip)) return;
     const k=(e.snip?'S':'W')+e.w; if(seen.has(k)) return; seen.add(k);
-    // the way to write this word in Latin letters (a hand-written alias first, otherwise the generated spelling), shown next to the Amharic word
-    const lats=(e.also||[]).filter(a=>a&&/^[a-z]/i.test(a)&&!/[\u1200-\u137F]/.test(a));
-    const own=TR&&TR.spell?TR.spell(e.w).toLowerCase():'', typedAlias=lats.find(a=>a.toLowerCase().startsWith(low));
-    const lat=e.snip?'':(lats.find(a=>a.toLowerCase()===own)||typedAlias||lats[0]||'');
-    list.push({text:e.snip||e.w, word:e.w, latin:lat, gloss:e.gloss||'', snip:!!e.snip, score, render:renderHint});
-    // typing in Latin letters? offer the Latin spelling as its own choice too — it works exactly like the Amharic word
-    const lrow=e.snip?'':(typedAlias||(score<4?lat:''));
-    if(latin&&lrow&&lrow.toLowerCase()!==low&&!seen.has('L'+lrow)){ seen.add('L'+lrow); list.push({text:lrow, word:lrow, latin:'', gloss:e.gloss||'', snip:false, score:score+0.5, render:renderHint}); }
+    list.push({text:e.snip||e.w, word:e.w, gloss:e.gloss||'', snip:!!e.snip, score, render:renderHint});
   });
   list.sort((a,b)=>(b.snip-a.snip)||a.score-b.score||a.word.length-b.word.length);
   return list.length?{list:list.slice(0,30),from:CodeMirror.Pos(cur.line,s),to:cur}:null;
@@ -2060,60 +2060,10 @@ window.addEventListener('appinstalled', () => { deferredInstall = null; document
 function installApp(){ if(!deferredInstall) return; deferredInstall.prompt(); deferredInstall = null; document.getElementById('install-btn').style.display = 'none'; }
 if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 
-/* ================= code text size (A− / A+, Ctrl +/−/0, Ctrl+wheel) and the drag bar between code and preview ================= */
-const CODE_FS_MIN = 10, CODE_FS_MAX = 34, CODE_FS_DEFAULT = 14;
-let codeFs = CODE_FS_DEFAULT;
-function applyCodeSize(){
-  document.documentElement.style.setProperty('--code-fs', codeFs + 'px');
-  const v = document.getElementById('zoom-val'); if(v) v.textContent = codeFs;
-  Object.values(cmInstances).forEach(cm => { if(cm && cm.refresh) cm.refresh(); });
-}
-function changeCodeSize(delta){
-  codeFs = delta === 0 ? CODE_FS_DEFAULT : Math.max(CODE_FS_MIN, Math.min(CODE_FS_MAX, codeFs + delta));
-  try{ localStorage.setItem('direnya-code-size', String(codeFs)); }catch(e){}
-  applyCodeSize();
-}
-function initCodeSize(){
-  try{ const n = parseInt(localStorage.getItem('direnya-code-size'), 10); if(n >= CODE_FS_MIN && n <= CODE_FS_MAX) codeFs = n; }catch(e){}
-  applyCodeSize();
-  const pane = document.querySelector('.editor-pane');
-  if(pane) pane.addEventListener('wheel', e => { if(!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); changeCodeSize(e.deltaY < 0 ? 1 : -1); }, { passive:false });
-}
-
-function initSplit(){
-  const handle = document.getElementById('split-handle'), main = document.querySelector('main'), pane = document.querySelector('.editor-pane');
-  if(!handle || !main || !pane) return;
-  const DEFAULT = 46;                                  // % of the width for the code, same as the old fixed layout
-  const MIN_CODE = 320, MIN_PREVIEW = 280;             // px — keeps both sides usable
-  const clampPct = pct => { const w = main.clientWidth || 1; return Math.max(MIN_CODE / w * 100, Math.min(100 - MIN_PREVIEW / w * 100, pct)); };
-  const setPct = (pct, save) => {
-    pct = clampPct(pct); pane.style.width = pct.toFixed(2) + '%';
-    if(save){ try{ localStorage.setItem('direnya-split', pct.toFixed(2)); }catch(e){} }
-    Object.values(cmInstances).forEach(cm => { if(cm && cm.refresh) cm.refresh(); });
-    if(deviceWidth) setDevice(deviceWidth);
-  };
-  try{ const v = parseFloat(localStorage.getItem('direnya-split')); if(v > 0) setPct(v, false); }catch(e){}
-  let dragging = false;
-  handle.addEventListener('pointerdown', e => { dragging = true; handle.setPointerCapture(e.pointerId); document.body.classList.add('dragging-split'); e.preventDefault(); });
-  handle.addEventListener('pointermove', e => { if(!dragging) return; const r = main.getBoundingClientRect(); setPct((e.clientX - r.left) / r.width * 100, false); });
-  const stop = e => { if(!dragging) return; dragging = false; document.body.classList.remove('dragging-split'); try{ handle.releasePointerCapture(e.pointerId); }catch(_){}
-    setPct(pane.getBoundingClientRect().width / main.clientWidth * 100, true); };
-  handle.addEventListener('pointerup', stop); handle.addEventListener('pointercancel', stop);
-  handle.addEventListener('dblclick', () => setPct(DEFAULT, true));
-  handle.addEventListener('keydown', e => {            // keyboard: ← / → nudge the bar, Home resets
-    const cur = pane.getBoundingClientRect().width / main.clientWidth * 100;
-    if(e.key === 'ArrowLeft'){ e.preventDefault(); setPct(cur - 3, true); }
-    else if(e.key === 'ArrowRight'){ e.preventDefault(); setPct(cur + 3, true); }
-    else if(e.key === 'Home'){ e.preventDefault(); setPct(DEFAULT, true); }
-  });
-  window.addEventListener('resize', () => { if(pane.style.width) setPct(parseFloat(pane.style.width), false); });
-}
-
 // set up editors, then run once so the preview isn't blank
 window.addEventListener('DOMContentLoaded', () => {
   applyStoredTheme();
   initEditors();
-  initCodeSize(); initSplit();
   const idx0 = projIndex(), act0 = activeId();
   let restored = false;
   if(idx0.length && act0 && lsGet('direnya-proj:'+act0,null)){ loadState(lsGet('direnya-proj:'+act0)); restored = true; }
@@ -2123,7 +2073,7 @@ window.addEventListener('DOMContentLoaded', () => {
   wireSquiggles();
   buildCodeBar('html');
   wireUndoButtons(); resetUndoHistory();
-  openFromHash().then(function(){ if(!VIEWER_MODE){ saveActiveProject(); runProgram(); } });
+  loadPersistedAssets().then(()=>openFromHash()).then(function(){ if(!VIEWER_MODE){ saveActiveProject(); runProgram(); } });
   if(restored) showToast('✓ ካለፈው ክፍለ ጊዜ ተመልሷል (auto-saved)');
   let seen = null; try{ seen = localStorage.getItem('direnya-onboarded'); }catch(e){}
   if(!seen){ if(restored || location.hash){ try{ localStorage.setItem('direnya-onboarded','1'); }catch(e){} } else showWelcome(); }

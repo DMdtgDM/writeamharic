@@ -33,6 +33,7 @@ const PLAYGROUND = path.join(ROOT, 'playground');
 // Files that ARE synced as real sibling files (playground <script src="...">s these directly).
 const SYNCED_FILES = [
   'dictionaries.js',
+  'translit.js',
   'html-transpiler.js',
   'css-transpiler.js',
   'js-transpiler.js',

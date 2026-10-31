@@ -100,6 +100,11 @@
     "ዝግ": "disabled", "zig": "disabled",
     "ሲነካ": "onclick", "sineka": "onclick",
     "ሲቀየር": "onchange", "sikeyer": "onchange",
+    "ሲተየብ": "oninput", "sitetyeb": "oninput",
+    "ሲላክ": "onsubmit", "silak": "onsubmit",
+    "ይዘት": "content", "yizet": "content",
+    "ቋንቋ": "lang", "kuankua": "lang",
+    "ከፍተኛ-ርዝመት": "maxlength", "kefitegna-rizmet": "maxlength",
     "ኢላማ": "target", "ilama": "target",
     "ረድፎች": "rows", "redfoch": "rows",
     "አምዶች": "cols", "amdoch": "cols",
@@ -157,6 +162,14 @@
     "ውስጠ-ክፍተት-ቀኝ": "padding-right", "wuste-kifitet-kegn": "padding-right",
     "ድንበር": "border", "dinber": "border",
     "ድንበር-ክብነት": "border-radius", "yedinber-kibnet": "border-radius",
+    "ድንበር-ላይ": "border-top", "dinber-lay": "border-top",
+    "ድንበር-ታች": "border-bottom", "dinber-tach": "border-bottom",
+    "ድንበር-ግራ": "border-left", "dinber-gra": "border-left",
+    "ድንበር-ቀኝ": "border-right", "dinber-kegn": "border-right",
+    "ድንበር-ቀለም": "border-color", "dinber-kelem": "border-color",
+    "ድንበር-ስፋት": "border-width", "dinber-sefat": "border-width",
+    "ይዘት": "content", "yizet": "content",
+    "ሸብልል-ባህሪ": "scroll-behavior", "shebilil-bahriy": "scroll-behavior",
     "ድንበር-ክ": "border-radius", "yedinber-kእ": "border-radius",
     "የድንበር-ክብነት": "border-radius",
     "ስፋት": "width", "sifat": "width",
@@ -226,6 +239,36 @@
     "እንቅስቃሴ-ቆይታ": "animation-duration", "enkeskase-koyita": "animation-duration",
   };
 
+  // ---- HTML attribute VALUES: Amharic/Latin -> real value, per real attribute ----
+  // Unlike TAGS/ATTRS (names), values are free-form author content in general
+  // (a URL, a number, a sentence) — translating them blindly would risk
+  // mangling a student's own text. So this ONLY fires for a short, fixed
+  // list of real attributes whose values are themselves a small closed
+  // vocabulary (HTML enum-like attributes: input type, list style, etc.),
+  // and only when the value EXACTLY matches an entry (whole value, after
+  // trimming) — never a substring or partial match. See html-transpiler.js.
+  const ATTR_VALUES = {
+    type: {
+      "ጽሑፍ": "text", "tsihuf": "text",
+      "ኢሜይል": "email", "email": "email",
+      "የይለፍ-ቃል": "password", "yeyilef-kal": "password",
+      "ቁጥር": "number", "kitir": "number",
+      "ማረጋገጫ-ሳጥን": "checkbox", "maregagecha-saten": "checkbox",
+      "ሬዲዮ": "radio", "redio": "radio",
+      "ቀን": "date", "ken": "date",
+      "ሰዓት": "time", "seat": "time",
+      "ፋይል": "file", "file": "file",
+      "ደብቅ": "hidden", "debk": "hidden",
+      "አስረክብ": "submit", "asrekb": "submit",
+      "ጠቅ-አድራጊ": "button", "tek-adragi": "button",
+      "ክልል": "range", "kilil": "range",
+      "ቀለም-መራጭ": "color", "kelem-meratch": "color",
+      "ፍለጋ": "search", "flega": "search",
+      "ስልክ": "tel", "silk": "tel",
+      "አድራሻ-ድር": "url", "adrasha-dir": "url",
+    },
+  };
+
   // ---- Optional: common Amharic color words -> CSS color values ----
   // Applied only to color-ish properties (see css-transpiler.js)
   const CSS_COLOR_VALUES = {
@@ -267,6 +310,9 @@
   // is what runtime.js reads to define each alias automatically, so this
   // is the ONLY place you need to add a word if you add a new builtin.
   const RUNTIME_ALIASES = {
+    "ርዝመት": "rtkmet", "ጨምር": "chemr", "አውጣ": "awta", "ደርድር": "derder", "ገልብጥ": "gelbt",
+    "ይዟል": "yzual", "ማጣሪያ": "matsharia", "ቀይር": "keyir", "ድምር": "dmr",
+    "እቃ_ፍጠር": "ekw_fetr", "እቃ_አስቀምጥ": "ekw_askemt", "እቃ_አግኝ": "ekw_agn", "ቁልፎች": "kulfoch", "ዋጋዎች": "wagawoch",
     "ጻፍ": "tsaf",                    // write
     "አሳውቅ": "asawek",                // alert
     "አትም": "atim",                   // console.log
@@ -299,5 +345,5 @@
     "ወደ_እቃ": "wede_iqa",             // JSON.parse
   };
 
-  return { TAGS, ATTRS, CSS_PROPS, CSS_COLOR_VALUES, JS_KEYWORD_ALIASES, RUNTIME_ALIASES };
+  return { TAGS, ATTRS, ATTR_VALUES, CSS_PROPS, CSS_COLOR_VALUES, JS_KEYWORD_ALIASES, RUNTIME_ALIASES };
 });

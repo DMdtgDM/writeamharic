@@ -1,0 +1,7 @@
+{
+  "appId": "com.simplexer.direnya",
+  "appName": "ድርኛ",
+  "webDir": "playground",
+  "backgroundColor": "#0F172A",
+  "server": { "androidScheme": "https" }
+}

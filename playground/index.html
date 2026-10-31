@@ -2,33 +2,64 @@
 <html lang="am">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F172A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ድርኛ">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>ድርኛ — መጫወቻ (Direnya Playground)</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<style>@font-face{font-family:"Noto Sans Ethiopic";font-weight:400;font-display:swap;src:url(vendor/ethiopic-400.woff2) format("woff2");}@font-face{font-family:"Noto Sans Ethiopic";font-weight:600 700;font-display:swap;src:url(vendor/ethiopic-700.woff2) format("woff2");}</style>
+<link rel="stylesheet" href="vendor/codemirror.min.css">
 <style>
   :root{
+    /* ===== Theme: ጨለማ (Dark) — the default, no data-theme attribute needed ===== */
     --primary:#1E3A8A; --primary-d:#16296B; --secondary:#F59E0B; --secondary-d:#D6870A;
     --bg:#0F172A; --panel:#111C34; --border:#22335C; --text:#E5EAF8; --muted:#8CA0D0;
     --success:#16A34A; --error:#F87171; --warn-bg:#241726;
+    --on-secondary:#111827; --on-primary:#FFFFFF;
+    --cm-tag:#7CB7FF; --cm-attribute:#C4B5FD; --cm-string:#86EFAC; --cm-number:#F9A8D4; --cm-property:#7DD3FC; --cm-atom:#F9A8D4; --cm-keyword:#F59E0B; --cm-builtin:#67E8F9; --cm-comment:#8190B5;
   }
-  /* ብርሃን ሁነታ — light mode. Toggled via .light-mode on <body>; everything else
-     in this file reads colors through the variables above, so this is the
-     only place light mode needs to be defined. */
-  body.light-mode{
-    --bg:#FFFFFF; --panel:#F1F5F9; --border:#E2E8F0; --text:#1E293B; --muted:#64748B;
-    --warn-bg:#FEF2F2;
+  /* ===== Every other theme — everything in this file reads colors through the
+     variables above, so a new theme is just a new block here plus one entry
+     in the THEMES list, further down in the JS. Picked via the 🎨 button's
+     theme picker (see showThemeModal/applyTheme), remembered in localStorage. ===== */
+  /* ===== ክላሲክ (Classic) — the original look: dark UI + the classic editor colours (green tags, blue attributes, red strings, purple keywords) ===== */
+  body[data-theme="classic"]{
+    --cm-tag:#3DD64F; --cm-attribute:#6C9BFF; --cm-string:#FF6B6B; --cm-number:#2FD1A0; --cm-property:#6C9BFF;
+    --cm-atom:#A78BFA; --cm-keyword:#C77DFF; --cm-builtin:#8E9BFF; --cm-comment:#E0953A;
   }
-  body.light-mode .cm-tag{color:#0369A1;}
-  body.light-mode .cm-attribute{color:#B91C1C;}
-  body.light-mode .cm-string{color:#15803D;}
-  body.light-mode .cm-number{color:#B45309;}
-  body.light-mode .cm-property{color:#0369A1;}
-  body.light-mode .cm-atom{color:#B45309;}
-  body.light-mode .cm-direnya-keyword{color:#B45309;}
-  body.light-mode .cm-direnya-builtin{color:#6D28D9;}
-  body.light-mode .cm-comment{color:var(--muted);}
+  body[data-theme="light"]{
+    --bg:#FFFFFF; --panel:#F1F5F9; --border:#E2E8F0; --text:#1E293B; --muted:#566478;
+    --error:#B91C1C; --warn-bg:#FEF2F2;
+    --cm-tag:#1D4ED8; --cm-attribute:#7C3AED; --cm-string:#15803D; --cm-number:#BE185D; --cm-property:#0369A1; --cm-atom:#BE185D; --cm-keyword:#B45309; --cm-builtin:#0E7490; --cm-comment:#566478;
+  }
+  body[data-theme="dracula"]{
+    --primary:#6272A4; --primary-d:#44475A; --secondary:#FF79C6; --secondary-d:#E066B0;
+    --bg:#282A36; --panel:#21222C; --border:#44475A; --text:#F8F8F2; --muted:#9A9CB8;
+    --success:#50FA7B; --error:#FF5555; --warn-bg:#3A2130;
+    --cm-tag:#FF79C6; --cm-attribute:#50FA7B; --cm-string:#F1FA8C; --cm-number:#BD93F9; --cm-property:#8BE9FD; --cm-atom:#BD93F9; --cm-keyword:#FFB86C; --cm-builtin:#8BE9FD; --cm-comment:#8E9BC9;
+  }
+  body[data-theme="solarized"]{
+    --primary:#1D6FA5; --primary-d:#155580; --secondary:#B5400F; --secondary-d:#963409; --on-secondary:#FFFFFF;
+    --bg:#002B36; --panel:#073642; --border:#0E4A58; --text:#EEE8D5; --muted:#93A1A1;
+    --success:#859900; --error:#FF6B68; --warn-bg:#301B16;
+    --cm-tag:#4FA9E8; --cm-attribute:#D9A520; --cm-string:#35C0B6; --cm-number:#E662A8; --cm-property:#4FA9E8; --cm-atom:#E662A8; --cm-keyword:#A6B800; --cm-builtin:#E8754A; --cm-comment:#7D9399;
+  }
+  body[data-theme="ocean"]{
+    --primary:#0E7490; --primary-d:#0B5A72; --secondary:#22D3EE; --secondary-d:#15B6CE;
+    --bg:#0B1E2D; --panel:#0F2A3E; --border:#174459; --text:#E0F2FE; --muted:#7DA6C2;
+    --success:#2DD4BF; --error:#FB7185; --warn-bg:#1F2937;
+    --cm-tag:#5EEAD4; --cm-attribute:#93C5FD; --cm-string:#FDE68A; --cm-number:#FDBA74; --cm-property:#5EEAD4; --cm-atom:#FDBA74; --cm-keyword:#FBBF24; --cm-builtin:#C4B5FD; --cm-comment:#7FA3BD;
+  }
+  body[data-theme="sunset"]{
+    --primary:#9D174D; --primary-d:#7A1239; --secondary:#FB923C; --secondary-d:#EA7C1F;
+    --bg:#2A1220; --panel:#3A1830; --border:#5C2545; --text:#FDE8E8; --muted:#C98BA8;
+    --success:#34D399; --error:#F87171; --warn-bg:#401A2A;
+    --cm-tag:#FDBA74; --cm-attribute:#F9A8D4; --cm-string:#FDE68A; --cm-number:#FB7185; --cm-property:#FDBA74; --cm-atom:#FB7185; --cm-keyword:#FB923C; --cm-builtin:#D8B4FE; --cm-comment:#B98BA6;
+  }
   *{box-sizing:border-box;}
   body{margin:0; font-family:'Noto Sans Ethiopic',sans-serif; background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column;}
   header{background:var(--panel); border-bottom:1px solid var(--border); padding:10px 16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
@@ -36,23 +67,24 @@
   header h1 .mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;}
   header .spacer{flex:1;}
   button{font-family:inherit; cursor:pointer; border:none; border-radius:8px; padding:8px 16px; font-weight:600; font-size:.85rem;}
-  .btn-run{background:var(--secondary); color:#fff; padding:4px 7px;}
+  .btn-run{background:var(--secondary); color:var(--on-secondary);}
+  .btn-primary{background:var(--primary); color:var(--on-primary);}
   .btn-run:hover{background:var(--secondary-d);}
-  .btn-dl{background:transparent; color:var(--text); border:1px solid var(--border); padding:4px 6px;}
+  .btn-dl{background:transparent; color:var(--text); border:1px solid var(--border);}
   .btn-dl:hover{border-color:var(--secondary);}
-  .btn-theme{background:transparent; color:var(--text); border:1px solid var(--border); padding:3px 5px;}
+  .btn-theme{background:transparent; color:var(--text); border:1px solid var(--border); padding:8px 12px;}
   .btn-theme:hover{border-color:var(--secondary);}
   main{flex:1; display:flex; min-height:0;}
   .editor-pane{width:46%; display:flex; flex-direction:column; border-right:1px solid var(--border); min-width:320px;}
-  .page-bar{display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:4px 10px; background:var(--panel); border-bottom:1px solid var(--border);}
-  .page-pill{display:flex; align-items:center; gap:6px; padding:2px 8px; border-radius:8px; font-size:.8rem; font-weight:500; color:var(--muted); background:transparent; border:1px solid var(--border); cursor:pointer;}
-  .page-pill.active{color:#fff; background:var(--secondary); border-color:var(--secondary);}
+  .page-bar{display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:8px 10px; background:var(--panel); border-bottom:1px solid var(--border);}
+  .page-pill{display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; font-size:.8rem; font-weight:600; color:var(--muted); background:transparent; border:1px solid var(--border); cursor:pointer;}
+  .page-pill.active{color:var(--on-secondary); background:var(--secondary); border-color:var(--secondary);}
   .page-pill .del-btn{opacity:.7; font-weight:400; padding:0 2px;}
   .page-pill .del-btn:hover{opacity:1;}
-  .page-add-btn{padding:2px 8px; border-radius:999px; font-size:.8rem; font-weight:800; color:var(--muted); background:transparent; border:1px dashed var(--border); cursor:pointer;}
+  .page-add-btn{padding:5px 10px; border-radius:999px; font-size:.8rem; font-weight:600; color:var(--muted); background:transparent; border:1px dashed var(--border); cursor:pointer;}
   .page-add-btn:hover{color:var(--secondary); border-color:var(--secondary);}
-  .tabs{display:flex; background:var(--panel); border-bottom:1px solid var(--border); padding:1px 16px;}
-  .tab{padding:6.5px 16px; font-size:.85rem; font-weight:600; color:var(--muted); border-bottom:2px solid transparent; cursor:pointer;}
+  .tabs{display:flex; background:var(--panel); border-bottom:1px solid var(--border);}
+  .tab{padding:10px 16px; font-size:.85rem; font-weight:600; color:var(--muted); border-bottom:2px solid transparent; cursor:pointer;}
   .tab.active{color:var(--secondary); border-bottom-color:var(--secondary);}
   .tab-content{flex:1; display:none; min-height:0;}
   .tab-content.active{display:flex;}
@@ -69,18 +101,31 @@
   .CodeMirror-linenumber{color:var(--muted); opacity:.6;}
   .CodeMirror-cursor{border-left:1.5px solid var(--secondary);}
   .CodeMirror-selected{background:rgba(245,158,11,.18) !important;}
-  .cm-tag{color:#7DD3FC;}                 /* HTML tag names (structural — works for any tag name, Amharic included) */
-  .cm-attribute{color:#FCA5A5;}           /* HTML attribute names */
-  .cm-string{color:#86EFAC;}              /* strings, in any of the three languages */
-  .cm-number{color:#FCD34D;}
-  .cm-comment{color:var(--muted); font-style:italic;}
-  .cm-property{color:#7DD3FC;}            /* CSS property names — structural, works for Amharic property names too */
-  .cm-atom{color:#FCD34D;}
-  .cm-direnya-keyword{color:#F59E0B; font-weight:600;}   /* ካሆነ/ጨርስ/ወይም/ድገም/ተግባር/... */
-  .cm-direnya-builtin{color:#C4B5FD; font-weight:600;}   /* ጻፍ/አሳውቅ/አትም */
+  /* token colours — `body .CodeMirror` outranks CodeMirror's built-in .cm-s-default rules, so every theme really recolours the code */
+  body .CodeMirror .cm-tag{color:var(--cm-tag);}                 /* HTML tag names (structural — works for any tag name, Amharic included) */
+  body .CodeMirror .cm-attribute{color:var(--cm-attribute);}     /* HTML attribute names */
+  body .CodeMirror .cm-string, body .CodeMirror .cm-string-2{color:var(--cm-string);}
+  body .CodeMirror .cm-number{color:var(--cm-number);}
+  body .CodeMirror .cm-comment{color:var(--cm-comment); font-style:italic;}
+  body .CodeMirror .cm-property{color:var(--cm-property);}       /* CSS property names */
+  body .CodeMirror .cm-atom{color:var(--cm-atom);}
+  body .CodeMirror .cm-keyword{color:var(--cm-keyword);}
+  body .CodeMirror .cm-def, body .CodeMirror .cm-builtin{color:var(--cm-builtin);}
+  body .CodeMirror .cm-variable, body .CodeMirror .cm-variable-2, body .CodeMirror .cm-variable-3, body .CodeMirror .cm-type{color:var(--text);}
+  body .CodeMirror .cm-operator, body .CodeMirror .cm-punctuation, body .CodeMirror .cm-bracket, body .CodeMirror .cm-meta, body .CodeMirror .cm-qualifier{color:var(--muted);}
+  body .CodeMirror .cm-link{color:var(--cm-tag); text-decoration:underline;}
+  body .CodeMirror .cm-error{color:var(--error);}
+  body .CodeMirror .cm-direnya-keyword{color:var(--cm-keyword); font-weight:600;}   /* ካሆነ/ጨርስ/ወይም/ድገም/ተግባር/... */
+  body .CodeMirror .cm-direnya-builtin{color:var(--cm-builtin); font-weight:600;}   /* ጻፍ/አሳውቅ/አትም */
   .preview-pane{flex:1; display:flex; flex-direction:column; min-width:280px;}
   .preview-head{background:var(--panel); border-bottom:1px solid var(--border); padding:8px 14px; font-size:.78rem; color:var(--muted); display:flex; justify-content:space-between; align-items:center;}
   iframe{flex:1; border:none; background:#fff;}
+  /* device preview: the page renders at the device's REAL width (so media queries behave) and is scaled down to fit the pane */
+  #preview-stage{flex:1; min-height:0; display:flex; justify-content:center; align-items:flex-start; background:var(--bg); overflow:hidden;}
+  #preview-stage iframe{flex:none; width:100%; height:100%; transform-origin:top center;}
+  #preview-stage.device{background:var(--panel); padding-top:10px;}
+  #preview-stage.device iframe{border:1px solid var(--border); border-radius:10px; box-shadow:0 6px 24px rgba(0,0,0,.4);}
+  #device-label{font-size:.72rem; color:var(--muted); margin-right:4px; white-space:nowrap;}
   .warnings{background:var(--warn-bg); border-top:1px solid var(--border); max-height:120px; overflow-y:auto; padding:8px 14px; font-size:.78rem; color:var(--error); font-family:'Fira Code',monospace; display:none;}
   .warnings.show{display:block;}
   footer{background:var(--panel); border-top:1px solid var(--border); padding:8px 16px; font-size:.72rem; color:var(--muted); text-align:center;}
@@ -89,6 +134,65 @@
   .toast.error{background:var(--error);}
   #autosave-dot{opacity:0; transition:opacity .3s ease; font-size:.9rem; margin-right:4px;}
   #autosave-dot.show{opacity:.55;}
+  .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index:100;}
+  .modal-backdrop.show{display:flex;}
+  .modal-box{background:var(--panel); color:var(--text); border-radius:12px; padding:20px 24px; max-width:440px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 10px 40px rgba(0,0,0,.3);}
+  .modal-box h2{margin:0 0 12px; font-size:1.05rem;}
+  .modal-box table{width:100%; border-collapse:collapse; font-size:.85rem;}
+  .modal-box td{padding:6px 0; border-bottom:1px solid var(--border);}
+  .modal-box td:first-child{white-space:nowrap; padding-right:14px;}
+  .modal-box kbd{background:var(--warn-bg); border:1px solid var(--border); border-radius:4px; padding:1px 7px; font-family:'Fira Code',monospace; font-size:.78rem;}
+  .modal-box .modal-close{margin-top:16px; width:100%; padding:8px; border-radius:8px; border:none; background:var(--primary); color:#fff; font-weight:600; cursor:pointer;}
+  .theme-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+  .theme-swatch{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; border:2px solid var(--border); background:var(--panel); color:var(--text); cursor:pointer; font-family:inherit; font-size:.85rem; font-weight:600; text-align:left;}
+  .theme-swatch:hover{border-color:var(--secondary);}
+  .theme-swatch.active{border-color:var(--secondary); box-shadow:0 0 0 1px var(--secondary);}
+  .theme-swatch .dots{display:flex; gap:3px; flex-shrink:0;}
+  .theme-swatch .dots span{width:12px; height:12px; border-radius:50%; display:block;}
+  /* compact chrome: more room for the editor */
+  header{padding:4px 10px; gap:5px; flex-wrap:nowrap; position:relative;}
+  header h1{font-size:.95rem; flex-shrink:0;}
+  header .mark{width:22px; height:22px; font-size:.75rem;}
+  header button.ic{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; padding:2px 8px; min-width:52px; min-height:38px; white-space:nowrap;}
+  header button.ic .ico{font-size:1rem; line-height:1.05;}
+  header button.ic .lbl{font-size:.66rem; line-height:1.15; font-weight:600;}
+  header .runbtn{padding:0 16px; min-height:38px; font-size:.95rem; font-weight:700; white-space:nowrap;}
+  header button.ic:disabled{opacity:.38; cursor:default;}
+  header .sep{width:1px; align-self:stretch; background:var(--border); margin:3px 2px; flex-shrink:0;}
+  header{overflow-x:auto; scrollbar-width:none;}
+  header::-webkit-scrollbar{display:none;}
+  header button, header #autosave-dot{flex-shrink:0;}
+  header #autosave-dot{margin-right:0;}
+  .bars{display:flex; flex-wrap:wrap; align-items:stretch; background:var(--panel); border-bottom:1px solid var(--border);}
+  .bars .tabs{border-bottom:none; flex:none;}
+  .bars .page-bar{flex:1; justify-content:flex-end; border-bottom:none; min-width:0; padding:3px 8px;}
+  .page-bar{padding:4px 8px;}
+  #code-bar{display:flex; gap:4px; overflow-x:auto; padding:5px 6px; background:var(--panel); border-top:1px solid var(--border); flex-shrink:0; scrollbar-width:thin;}
+  #code-bar .cb{flex:none; padding:5px 10px; font-family:'Fira Code',ui-monospace,monospace; font-size:.82rem; font-weight:500; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:6px; min-height:30px;}
+  #code-bar .cb:hover{border-color:var(--secondary);}
+  #code-bar .cb.kw{color:var(--cm-keyword); font-weight:700;}
+  #code-bar .cb.tag{color:var(--cm-tag);}
+  #code-bar .cb.prop{color:var(--cm-property);}
+  #code-bar .cb.sym{color:var(--muted); min-width:34px;}
+  .page-pill{padding:3px 9px; font-size:.78rem;}
+  .tab{padding:6px 14px; font-size:.82rem;}
+  .preview-head{padding:4px 10px;}
+  footer{padding:3px 10px; font-size:.68rem;}
+  .dev-btn{padding:1px 6px; font-size:.75rem; line-height:1.4;}
+  /* autocomplete dropdown — follows the theme */
+  body .CodeMirror-hints{background:var(--panel); border:1px solid var(--border); border-radius:10px; box-shadow:0 12px 32px rgba(0,0,0,.5); padding:4px; max-height:17em; z-index:400; font-family:inherit;}
+  body .CodeMirror-hints .CodeMirror-hint{display:flex; align-items:baseline; gap:10px; min-width:210px; padding:5px 10px; border-radius:6px; color:var(--text); font-size:.92rem; line-height:1.35; white-space:nowrap;}
+  body .CodeMirror-hints .CodeMirror-hint .hint-w{font-weight:600; flex:1;}
+  body .CodeMirror-hints .CodeMirror-hint .hint-g{font-size:.74rem; color:var(--muted);}
+  body .CodeMirror-hints .CodeMirror-hint .hint-b{font-size:.62rem; font-weight:700; padding:0 5px; border:1px solid var(--cm-keyword); color:var(--cm-keyword); border-radius:4px;}
+  body .CodeMirror-hints li.CodeMirror-hint-active{background:var(--secondary); color:var(--on-secondary);}
+  body .CodeMirror-hints li.CodeMirror-hint-active .hint-g{color:var(--on-secondary); opacity:.8;}
+  body .CodeMirror-hints li.CodeMirror-hint-active .hint-b{color:var(--on-secondary); border-color:var(--on-secondary);}
+  @media(max-width:760px){ body .CodeMirror-hints .CodeMirror-hint{padding:9px 12px; font-size:1rem;} }
+  .cm-squiggle{text-decoration:underline wavy var(--error); text-underline-offset:3px;}
+  .dev-btn{padding:2px 8px; border-radius:6px; font-size:.8rem; background:transparent; color:var(--muted); border:1px solid var(--border);}
+  .dev-btn.active{color:var(--on-secondary); background:var(--secondary); border-color:var(--secondary);}
+  #js-panel{display:none; margin:0; max-height:160px; overflow:auto; padding:8px 14px; font-family:'Fira Code',monospace; font-size:.76rem; background:var(--panel); color:var(--text); border-top:1px solid var(--border); white-space:pre-wrap;}
   @media(max-width:760px){
     main{flex-direction:column;}
     .editor-pane{width:100%; border-right:none; border-bottom:1px solid var(--border); height:50%;}
@@ -96,75 +200,286 @@
     header{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; gap:8px; padding:8px 10px;}
     header::-webkit-scrollbar{height:4px;}
     header h1{flex-shrink:0; font-size:.85rem;}
+    header .h1-text, header .desk{display:none;}
     header h1 .mark{width:22px; height:22px; font-size:.7rem;}
     header .spacer{display:none;}
     header button, header #autosave-dot{flex-shrink:0;}
-    header button{padding:7px 10px; font-size:.8rem; white-space:nowrap;}
+    .editor-pane,.preview-pane{height:100%;}
+    main.show-code .preview-pane, main.show-preview .editor-pane{display:none;}
+    #mobile-tabs{display:flex !important;}
+    #run-fab{display:flex !important;}
+    .dev-btn[data-w]{display:none;}
   }
+  #mobile-tabs{display:none; background:var(--panel); border-top:1px solid var(--border); padding-bottom:env(safe-area-inset-bottom,0px);}
+  #mobile-tabs button{flex:1; padding:12px 0; font-size:.95rem; background:transparent; color:var(--muted); border:none; border-top:3px solid transparent;}
+  #mobile-tabs button.active{color:var(--text); border-top-color:var(--secondary); font-weight:600;}
+  #run-fab{display:none; position:fixed; right:16px; bottom:calc(64px + env(safe-area-inset-bottom,0px)); width:56px; height:56px; border-radius:50%; align-items:center; justify-content:center; font-size:1.4rem; border:none; background:var(--secondary); color:var(--on-secondary); box-shadow:0 4px 14px rgba(0,0,0,.4); z-index:50;}
+  main.show-preview ~ #run-fab{display:none !important;}
+  header{padding-top:max(8px,env(safe-area-inset-top,0px));}
+  #welcome-dots span{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--border); margin:0 3px;}
+  #welcome-dots span.on{background:var(--secondary);}
 </style>
 </head>
 <body>
 
 <header>
-  <h1><span class="mark">ድ</span> ድርኛ</h1>
+  <h1><span class="mark">ድ</span> <span class="h1-text">ድርኛ</span></h1>
   <span class="spacer"></span>
   <span id="autosave-dot" title="በራስ-ሰር ተቀምጧል (auto-saved)">💾</span>
-  <button class="btn-theme" id="theme-toggle" onclick="toggleTheme()" title="ገጽታ ቀይር (Toggle light/dark)">🌙</button>
-  <button class="btn-run" onclick="runProgram()">▶ አሳይ</button>
+  <button class="btn-dl ic" id="undo-btn" onmousedown="event.preventDefault()" onclick="doUndo()" title="ቀልብስ (Undo — Ctrl+Z)"><span class="ico">↶</span><span class="lbl">ቀልብስ</span></button>
+  <button class="btn-dl ic" id="redo-btn" onmousedown="event.preventDefault()" onclick="doRedo()" title="እንደገና (Redo — Ctrl+Y)"><span class="ico">↷</span><span class="lbl">እንደገና</span></button>
+  <span class="sep"></span>
+  <button class="btn-dl ic" onclick="showTemplates()" title="ምሳሌዎች (Examples)"><span class="ico">📋</span><span class="lbl">ምሳሌ</span></button>
+  <button class="btn-dl ic" onclick="showProjects()" title="ፕሮጀክቶች (Projects)"><span class="ico">📁</span><span class="lbl">ፕሮጀክት</span></button>
+  <button class="btn-dl ic" onclick="showHistory()" title="ታሪክ (Version history)"><span class="ico">🕘</span><span class="lbl">ታሪክ</span></button>
+  <button class="btn-run btn-primary ic" onclick="showShare()" title="አጋራ (Share)"><span class="ico">🔗</span><span class="lbl">አጋራ</span></button>
+  <button class="btn-run runbtn" onclick="runProgram(); mobTab('preview')" title="አሳይ (Run)">▶ አሳይ</button>
+  <span class="sep"></span>
   <input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
-  <button class="btn-dl" onclick="document.getElementById('photo-upload').click()">📷 ፎቶ (Photo)</button>
+  <button class="btn-dl ic" onclick="document.getElementById('photo-upload').click()" title="ፎቶ ጨምር (Add Photo)"><span class="ico">📷</span><span class="lbl">ፎቶ</span></button>
   <input type="file" id="video-upload" accept="video/*" style="display:none" onchange="handleVideoUpload(event)">
-  <button class="btn-dl" onclick="document.getElementById('video-upload').click()">📹 ቪዲዮ(Video)</button>
+  <button class="btn-dl ic" onclick="document.getElementById('video-upload').click()" title="ቪዲዮ ጨምር (Add Video)"><span class="ico">📹</span><span class="lbl">ቪዲዮ</span></button>
   <input type="file" id="file-open" accept=".ወብ,.txt" style="display:none" onchange="openWebFile(event)">
-  <button class="btn-dl" onclick="document.getElementById('file-open').click()">📂 ፕሮጀክት ክፈት (Open)</button>
-  <button class="btn-dl" onclick="saveWebFile()">💾  አስቀምጥ (Save)</button>
-  <button class="btn-dl" onclick="downloadPage()">⬇ ይህ ገጽ (This Page)</button>
-  <button class="btn-run" style="background:var(--primary)" onclick="downloadForHosting()">📦 ለሆስቲንግ</button>
-  <button class="btn-dl" onclick="if(confirm('የአሁኑን ኮድ አጥፍቶ ከባዶ መጀመር ይፈልጋሉ? This clears the saved code and starts over — it cannot be undone.')) clearAutosaveAndReset()">🗑 ከባዶ(Reset)</button>
+  <button class="btn-dl ic" onclick="document.getElementById('file-open').click()" title="ፕሮጀክት ክፈት (Open Project)"><span class="ico">📂</span><span class="lbl">ክፈት</span></button>
+  <button class="btn-dl ic" onclick="saveWebFile()" title="ፕሮጀክት አስቀምጥ (Save Project)"><span class="ico">💾</span><span class="lbl">አስቀምጥ</span></button>
+  <button class="btn-dl ic" onclick="downloadPage()" title="ይህ ገጽ ብቻ (This Page Only)"><span class="ico">⬇</span><span class="lbl">አውርድ</span></button>
+  <button class="btn-dl ic" onclick="downloadForHosting()" title="ለሆስቲንግ ዝግጁ (ZIP for hosting)"><span class="ico">📦</span><span class="lbl">ዚፕ</span></button>
+  <button class="btn-dl ic" onclick="if(confirm('የአሁኑን ኮድ አጥፍቶ ከባዶ መጀመር ይፈልጋሉ? This clears the saved code and starts over — it cannot be undone.')) clearAutosaveAndReset()" title="ከባዶ ጀምር (Reset)"><span class="ico">🗑</span><span class="lbl">አጽዳ</span></button>
+  <span class="sep"></span>
+  <button class="btn-theme ic" id="theme-toggle" onclick="showThemeModal()" title="ገጽታ ምረጥ (Theme)"><span class="ico">🎨</span><span class="lbl">ገጽታ</span></button>
+  <button class="btn-theme desk ic" onclick="showShortcutsModal()" title="የቁልፍ ሰሌዳ አቋራጭ (Keyboard shortcuts)"><span class="ico">⌨</span><span class="lbl">አቋራጭ</span></button>
+  <button class="btn-theme ic" onclick="showWelcome()" title="እገዛ (Help)"><span class="ico">❔</span><span class="lbl">እገዛ</span></button>
+  <button class="btn-run" id="install-btn" style="display:none" onclick="installApp()">📲 ጫን</button>
 </header>
 
-<main>
+<main class="show-code">
   <div class="editor-pane">
-    <div class="page-bar" id="page-bar">
-      
-    </div>
+    <div class="bars">
     <div class="tabs">
-      <div class="tab active" data-tab="html" id="tab-html-label">ገጽ <span style="opacity:.6">(HTML)</span></div>
-      <div class="tab" data-tab="css">ዘይቤ <span style="opacity:.6">(shared)</span></div>
-      <div class="tab" data-tab="js">ትእዛዝ <span style="opacity:.6">(shared)</span></div>
+      <div class="tab active" data-tab="html" id="tab-html-label">ገጽ.ድር <span style="opacity:.6">(HTML)</span></div>
+      <div class="tab" data-tab="css">ዘይቤ.ድር <span style="opacity:.6">(CSS, shared)</span></div>
+      <div class="tab" data-tab="js">ትእዛዝ.ድር <span style="opacity:.6">(JS, shared)</span></div>
+    </div>
+    <div class="page-bar" id="page-bar"></div>
     </div>
     <div class="tab-content active" data-tab="html"><textarea id="src-html" spellcheck="false"></textarea></div>
     <div class="tab-content" data-tab="css"><textarea id="src-css" spellcheck="false"></textarea></div>
     <div class="tab-content" data-tab="js"><textarea id="src-js" spellcheck="false"></textarea></div>
+    <div id="code-bar" role="toolbar" aria-label="ኮድ ቁልፎች (code keys)"></div>
   </div>
 
   <div class="preview-pane">
-    <div class="preview-head"><span>ውጤት (Preview) — <span id="preview-page-label">ገጽ</span></span><span style="display:flex;align-items:center;gap:8px;"><span class="page-add-btn" id="preview-reset-btn" style="display:none;" onclick="resetPreviewToEditor()">↺ ወደ አርታኢው ገጽ</span><span id="status">●</span></span></div>
-    <iframe id="preview" sandbox="allow-scripts allow-modals"></iframe>
+    <div class="preview-head"><span>ውጤት (Preview) — <span id="preview-page-label">ገጽ</span></span><span style="display:flex;align-items:center;gap:6px;"><span id="device-label"></span><button class="dev-btn" data-w="375" onclick="setDevice(375)" title="ስልክ (phone)">📱</button><button class="dev-btn" data-w="768" onclick="setDevice(768)" title="ታብሌት (tablet)">▭</button><button class="dev-btn active" data-w="" onclick="setDevice(0)" title="ሙሉ (full width)">🖥</button><button class="dev-btn" onclick="toggleJsPanel()" title="JavaScript አሳይ (show the JavaScript)">&lt;/&gt;</button><span class="page-add-btn" id="preview-reset-btn" style="display:none;" onclick="resetPreviewToEditor()">↺ ወደ አርታኢው ገጽ</span><span id="status">●</span></span></div>
+    <div id="preview-stage"><iframe id="preview" sandbox="allow-scripts allow-modals"></iframe></div>
+    <pre id="js-panel"></pre>
     <div class="warnings" id="warnings"></div>
   </div>
 </main>
+<nav id="mobile-tabs"><button class="active" data-t="code" onclick="mobTab('code')">✎ ኮድ (Code)</button><button data-t="preview" onclick="mobTab('preview')">👁 ውጤት (Preview)</button></nav>
+<button id="run-fab" onclick="runProgram(); mobTab('preview')" title="አሳይ (Run)">▶</button>
 
 <footer>ድርኛ (Direnya) — በአማርኛ ድረ-ገጽ የመሥሪያ መሣሪያ · Simplexer Project</footer>
 <div class="toast" id="toast"></div>
 
+<div class="modal-backdrop" id="shortcuts-modal" onclick="if(event.target===this) hideShortcutsModal()">
+  <div class="modal-box">
+    <h2>⌨ የቁልፍ ሰሌዳ አቋራጭ መንገዶች (Keyboard shortcuts)</h2>
+    <table>
+      <tr><td><kbd>Ctrl/Cmd</kbd>+<kbd>Enter</kbd></td><td>▶ አሳይ — Run / refresh preview</td></tr>
+      <tr><td><kbd>Ctrl/Cmd</kbd>+<kbd>S</kbd></td><td>💾 ፕሮጀክት አስቀምጥ — Save project (.ወብ)</td></tr>
+      <tr><td><kbd>Ctrl/Cmd</kbd>+<kbd>O</kbd></td><td>📂 ፕሮጀክት ክፈት — Open project</td></tr>
+      <tr><td><kbd>Alt</kbd>+<kbd>1</kbd></td><td>ገጽ.ድር tab (HTML)</td></tr>
+      <tr><td><kbd>Alt</kbd>+<kbd>2</kbd></td><td>ዘይቤ.ድር tab (CSS)</td></tr>
+      <tr><td><kbd>Alt</kbd>+<kbd>3</kbd></td><td>ትእዛዝ.ድር tab (JS)</td></tr>
+      <tr><td><kbd>Ctrl/Cmd</kbd>+<kbd>/</kbd></td><td>Comment / uncomment the current line (while an editor is focused)</td></tr>
+    </table>
+    <button class="modal-close" onclick="hideShortcutsModal()">ዝጋ (Close)</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="projects-modal" onclick="if(event.target===this) hideModal('projects-modal')"><div class="modal-box"><h2>📁 ፕሮጀክቶቼ (My projects)</h2><div id="projects-list"></div><button class="modal-close" style="background:var(--secondary)" onclick="createProject()">＋ አዲስ ፕሮጀክት (New)</button><button class="modal-close" onclick="hideModal('projects-modal')">ዝጋ (Close)</button></div></div>
+<div class="modal-backdrop" id="history-modal" onclick="if(event.target===this) hideModal('history-modal')"><div class="modal-box"><h2>🕘 ታሪክ (Version history)</h2><p style="font-size:.8rem;color:var(--muted)">በራስ-ሰር የተቀመጡ ቅጂዎች — ሰበርኩት? ወደ ቀድሞው ተመለስ። (Automatic snapshots — broke it? Go back.)</p><div id="history-list"></div><button class="modal-close" onclick="hideModal('history-modal')">ዝጋ (Close)</button></div></div>
+<div class="modal-backdrop" id="share-modal" onclick="if(event.target===this) hideModal('share-modal')"><div class="modal-box" style="max-width:560px"><h2>🔗 አጋራ (Share)</h2><div id="share-note" style="font-size:.8rem;color:var(--error)"></div><div id="share-links"></div><button class="modal-close" onclick="hideModal('share-modal')">ዝጋ (Close)</button></div></div>
+<div class="modal-backdrop" id="templates-modal" onclick="if(event.target===this) hideModal('templates-modal')"><div class="modal-box"><h2>📋 ምሳሌዎች (Starter examples)</h2><p style="font-size:.8rem;color:var(--muted)">እንደ አዲስ ፕሮጀክት ይከፈታል — ያለህ ስራ አይነካም። (Opens as a new project — your work is untouched.)</p><div id="templates-list"></div><button class="modal-close" onclick="hideModal('templates-modal')">ዝጋ (Close)</button></div></div>
+<div class="modal-backdrop" id="welcome-modal"><div class="modal-box" style="text-align:center"><div id="welcome-body" style="min-height:130px"></div><div id="welcome-dots" style="margin:8px 0"></div><div id="welcome-actions"></div></div></div>
+<div class="modal-backdrop" id="theme-modal" onclick="if(event.target===this) hideThemeModal()">
+  <div class="modal-box">
+    <h2>🎨 ገጽታ ምረጥ (Choose a theme)</h2>
+    <div class="theme-grid" id="theme-grid"><!-- filled by renderThemeGrid() --></div>
+    <button class="modal-close" onclick="hideThemeModal()">ዝጋ (Close)</button>
+  </div>
+</div>
+
 <!-- ===== CodeMirror (syntax highlighting) — loaded from CDN; the playground degrades
      gracefully to plain textareas if this is unavailable (e.g. no internet), see initEditors() ===== -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/mode/overlay.min.js"></script>
+<script src="vendor/codemirror.min.js"></script>
+<script src="vendor/xml.min.js"></script>
+<script src="vendor/css.min.js"></script>
+<script src="vendor/javascript.min.js"></script>
+<script src="vendor/overlay.min.js"></script>
+<script src="vendor/show-hint.min.js"></script>
+<link rel="stylesheet" href="vendor/show-hint.min.css">
 
 <!-- ===== Transpiler engine (same files as lib/, inlined for zero-setup use) ===== -->
 <script src="dictionaries.js"></script>
+<script src="translit.js"></script>
 <script src="html-transpiler.js"></script>
 <script src="css-transpiler.js"></script>
 <script src="js-transpiler.js"></script>
 <script src="web-format.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="vendor/jszip.min.js"></script>
 
 <script>
+/* ---------- last-resort error safety net ---------- */
+// Anything that throws outside the build pipeline itself (a bug in file
+// handling, asset upload, etc.) would otherwise fail completely silently
+// for the person using the app — this guarantees SOME visible feedback
+// instead of a page that just quietly stops responding.
+window.addEventListener('error', (e) => {
+  console.error('Unhandled error:', e.error || e.message);
+  showToast('✗ ያልተጠበቀ ስህተት ተፈጥሯል (unexpected error) — ስራህ አልጠፋም, refresh ካስፈለገ (your work is safe, but you may need to refresh)', true);
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('Unhandled promise rejection:', e.reason);
+  showToast('✗ ያልተጠበቀ ስህተት ተፈጥሯል (unexpected error)', true);
+});
+
+/* ---------- keyboard shortcuts ---------- */
+// Documented in docs/DIRENYA_DOCUMENTATION.md and in the in-app ⌨ modal
+// below — keep both in sync with this list if it ever changes.
+function showShortcutsModal(){ document.getElementById('shortcuts-modal').classList.add('show'); }
+function hideShortcutsModal(){ document.getElementById('shortcuts-modal').classList.remove('show'); }
+
+function activeTabName(){
+  const t = document.querySelector('.tab.active');
+  return t ? t.dataset.tab : 'html';
+}
+function activeEditorHasFocus(tabName){
+  const cm = cmInstances[tabName];
+  if(cm) return cm.hasFocus();
+  const ta = document.getElementById('src-'+tabName);
+  return document.activeElement === ta;
+}
+
+// Toggles "# " at the start of each line in the selection (JS only — the
+// only one of the three languages with a real per-line comment marker;
+// see RE.comment in lib/js-transpiler.js, which already tolerates leading
+// whitespace before the '#', so indentation is preserved here too).
+function toggleLineComment(tabName){
+  const marker = '#';
+  const cm = cmInstances[tabName];
+  if(cm){
+    const from = cm.getCursor('from').line, to = cm.getCursor('to').line;
+    const nonBlank = [];
+    for(let ln = from; ln <= to; ln++){ if(cm.getLine(ln).trim() !== '') nonBlank.push(ln); }
+    const allCommented = nonBlank.length > 0 && nonBlank.every(ln => /^\s*#/.test(cm.getLine(ln)));
+    cm.operation(()=>{
+      for(let ln = from; ln <= to; ln++){
+        const line = cm.getLine(ln);
+        if(line.trim() === '') continue;
+        const replaced = allCommented
+          ? line.replace(/^(\s*)#\s?/, '$1')
+          : line.replace(/^(\s*)/, `$1${marker} `);
+        cm.replaceRange(replaced, {line:ln, ch:0}, {line:ln, ch:line.length});
+      }
+    });
+    cm.focus();
+    return;
+  }
+  const ta = document.getElementById('src-'+tabName);
+  if(!ta) return;
+  const value = ta.value;
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+  let lineEnd = value.indexOf('\n', end);
+  if(lineEnd === -1) lineEnd = value.length;
+  const lines = value.slice(lineStart, lineEnd).split('\n');
+  const nonBlank = lines.filter(l => l.trim() !== '');
+  const allCommented = nonBlank.length > 0 && nonBlank.every(l => /^\s*#/.test(l));
+  const newBlock = lines.map(line=>{
+    if(line.trim() === '') return line;
+    return allCommented ? line.replace(/^(\s*)#\s?/, '$1') : line.replace(/^(\s*)/, `$1${marker} `);
+  }).join('\n');
+  ta.value = value.slice(0, lineStart) + newBlock + value.slice(lineEnd);
+  ta.selectionStart = lineStart; ta.selectionEnd = lineStart + newBlock.length;
+  ta.dispatchEvent(new Event('input'));
+  ta.focus();
+}
+
+// Wraps/unwraps the selection (or the current line, if nothing's selected)
+// in a block comment — <!-- --> for HTML, /* */ for CSS.
+function toggleBlockComment(tabName, open, close){
+  const cm = cmInstances[tabName];
+  if(cm){
+    let from = cm.getCursor('from'), to = cm.getCursor('to');
+    if(!cm.somethingSelected()){
+      from = {line: from.line, ch: 0};
+      to = {line: to.line, ch: cm.getLine(to.line).length};
+    }
+    const text = cm.getRange(from, to);
+    const trimmed = text.trim();
+    const replacement = (trimmed.startsWith(open) && trimmed.endsWith(close))
+      ? trimmed.slice(open.length, trimmed.length - close.length).trim()
+      : `${open} ${trimmed} ${close}`;
+    cm.replaceRange(replacement, from, to);
+    cm.focus();
+    return;
+  }
+  const ta = document.getElementById('src-'+tabName);
+  if(!ta) return;
+  const value = ta.value;
+  let start = ta.selectionStart, end = ta.selectionEnd;
+  if(start === end){
+    start = value.lastIndexOf('\n', start - 1) + 1;
+    end = value.indexOf('\n', end); if(end === -1) end = value.length;
+  }
+  const trimmed = value.slice(start, end).trim();
+  const replacement = (trimmed.startsWith(open) && trimmed.endsWith(close))
+    ? trimmed.slice(open.length, trimmed.length - close.length).trim()
+    : `${open} ${trimmed} ${close}`;
+  ta.value = value.slice(0, start) + replacement + value.slice(end);
+  ta.selectionStart = start; ta.selectionEnd = start + replacement.length;
+  ta.dispatchEvent(new Event('input'));
+  ta.focus();
+}
+
+function toggleCommentForActiveTab(){
+  const tabName = activeTabName();
+  if(tabName === 'js') toggleLineComment('js');
+  else if(tabName === 'css') toggleBlockComment('css', '/*', '*/');
+  else toggleBlockComment('html', '<!--', '-->');
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && document.getElementById('shortcuts-modal').classList.contains('show')){
+    hideShortcutsModal(); return;
+  }
+  if(e.key === 'Escape' && document.getElementById('theme-modal').classList.contains('show')){
+    hideThemeModal(); return;
+  }
+  const mod = e.ctrlKey || e.metaKey;
+  if(mod){
+    const key = e.key.toLowerCase();
+    if(key === 'enter'){ e.preventDefault(); runProgram(); return; }
+    if(key === 's'){ e.preventDefault(); saveWebFile(); return; }
+    if(key === 'o'){ e.preventDefault(); document.getElementById('file-open').click(); return; }
+    if(key === '/'){
+      const tabName = activeTabName();
+      if(activeEditorHasFocus(tabName)){ e.preventDefault(); toggleCommentForActiveTab(); }
+      return;
+    }
+    return;
+  }
+  // Alt+1/2/3 for tab switching — deliberately NOT Ctrl+1/2/3, which
+  // Chrome/Firefox/Edge reserve at the browser level for "switch to
+  // browser tab N" and won't let a page override.
+  if(e.altKey){
+    if(e.key === '1'){ e.preventDefault(); switchToTab('html'); return; }
+    if(e.key === '2'){ e.preventDefault(); switchToTab('css'); return; }
+    if(e.key === '3'){ e.preventDefault(); switchToTab('js'); return; }
+  }
+});
+
 /* ---------- tabs ---------- */
 document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click', ()=>{
@@ -182,6 +497,41 @@ document.querySelectorAll('.tab').forEach(tab=>{
 const cmInstances = {}; // { html: CodeMirror|null, css: ..., js: ... }
 
 const assetStore = new Map();
+
+/* ---------- photos/videos survive closing the tab (IndexedDB) ----------
+   assetStore is only memory, so before this a refresh made every <ምስል>
+   point at a file that no longer existed. Every upload is now also kept in
+   the browser's IndexedDB and put back before the first preview runs.
+   (A saved .ወብ file embeds the same files too — see saveWebFile.) */
+function idbOpen(){
+  return new Promise((res, rej)=>{
+    try{
+      const r = indexedDB.open('direnya-assets', 1);
+      r.onupgradeneeded = ()=> r.result.createObjectStore('files');
+      r.onsuccess = ()=> res(r.result);
+      r.onerror = ()=> rej(r.error);
+    }catch(e){ rej(e); }
+  });
+}
+async function persistAsset(name, file){
+  try{
+    const db = await idbOpen();
+    db.transaction('files','readwrite').objectStore('files').put(file, name);
+  }catch(e){ console.warn('Could not keep the file for next time:', e); }
+}
+async function loadPersistedAssets(){
+  try{
+    const db = await idbOpen();
+    await new Promise(res=>{
+      const req = db.transaction('files').objectStore('files').openCursor();
+      req.onsuccess = ()=>{
+        const c = req.result;
+        if(c){ if(!assetStore.has(c.key)) assetStore.set(c.key, c.value); c.continue(); } else res();
+      };
+      req.onerror = ()=> res();
+    });
+  }catch(e){ /* private mode etc. — just start empty */ }
+}
 
 // Avoids silently overwriting a previous "foto.jpg" with a new upload —
 // each upload gets a name guaranteed not to collide with what's already
@@ -307,6 +657,7 @@ function deletePage(name){
 // tool still opens correctly, with its one page becoming home.
 const PAGE_SECTION_RE = /^#ገጽ(?::(\S+))?\s*$/;
 const SHARED_SECTION_RE = /^#(ዘይቤ|ትእዛዝ)\s*$/;
+const ASSET_SECTION_RE = /^#ንብረት:(\S+)\s*$/;
 
 function serializeProject(){
   pages[currentPageName] = getSrc('html');
@@ -323,10 +674,22 @@ function serializeProject(){
   return parts.join('\n\n') + '\n';
 }
 
+// Same text as serializeProject(), plus every photo/video the project
+// uses, embedded as a data: URI — so the saved .ወብ is self-contained.
+async function serializeProjectWithAssets(){
+  let out = serializeProject();
+  const used = [...assetStore].filter(([name]) => out.includes(name));
+  for(const [name, file] of used){
+    out += '\n#ንብረት:' + name + '\n' + await fileToDataUri(file) + '\n';
+  }
+  return { text: out, count: used.length };
+}
+
 function parseProjectFile(source){
   const lines = source.split('\n');
   const parsedPages = {};
   const cssParts = [], jsParts = [];
+  const assets = {};
   let current = { type: 'page', name: HOME_PAGE };
   let buffer = [];
   let sawAnyMarker = false;
@@ -339,6 +702,8 @@ function parseProjectFile(source){
       cssParts.push(text);
     } else if(current.type === 'js' && text){
       jsParts.push(text);
+    } else if(current.type === 'asset' && text){
+      assets[current.name] = text.replace(/\s+/g, '');
     }
     buffer = [];
   }
@@ -347,6 +712,8 @@ function parseProjectFile(source){
     const trimmed = line.trim();
     const pm = PAGE_SECTION_RE.exec(trimmed);
     const sm = SHARED_SECTION_RE.exec(trimmed);
+    const am = ASSET_SECTION_RE.exec(trimmed);
+    if(am){ flush(); current = { type: 'asset', name: am[1] }; sawAnyMarker = true; continue; }
     if(pm){ flush(); current = { type: 'page', name: pm[1] || HOME_PAGE }; sawAnyMarker = true; continue; }
     if(sm){ flush(); current = { type: sm[1] === 'ዘይቤ' ? 'css' : 'js' }; sawAnyMarker = true; continue; }
     buffer.push(line);
@@ -360,7 +727,7 @@ function parseProjectFile(source){
   }
   if(!parsedPages[HOME_PAGE]) parsedPages[HOME_PAGE] = '';
 
-  return { pages: parsedPages, css: cssParts.join('\n\n'), js: jsParts.join('\n\n'), hadExplicitSections: sawAnyMarker };
+  return { pages: parsedPages, css: cssParts.join('\n\n'), js: jsParts.join('\n\n'), hadExplicitSections: sawAnyMarker, assets };
 }
 
 function getSrc(tab){
@@ -389,6 +756,8 @@ function switchToTab(tabName){
   if(contentEl) contentEl.classList.add('active');
   const cm = cmInstances[tabName];
   if(cm) setTimeout(()=>cm.refresh(), 0);
+  if(typeof buildCodeBar === 'function') buildCodeBar(tabName);
+  if(typeof updateUndoButtons === 'function') updateUndoButtons();
 }
 
 function insertAtCursor(tab, text){
@@ -436,6 +805,7 @@ function handlePhotoUpload(event){
 
   const filename = uniqueAssetName(file.name);
   assetStore.set(filename, file);
+  persistAsset(filename, file);
 
   // The HTML source now gets a plain, short, portable filename —
   // exactly what a learner would write by hand for a real hosted page.
@@ -470,6 +840,7 @@ function handleVideoUpload(event){
 
   const filename = uniqueAssetName(file.name);
   assetStore.set(filename, file);
+  persistAsset(filename, file);
 
   const tag = `<ቪዲዮ ምንጭ="${filename}" ቁጥጥሮች>\n  ብራውዘርዎ ቪዲዮ አይደግፍም።\n</ቪዲዮ>\n`;
   switchToTab('html');
@@ -548,6 +919,8 @@ function initEditors(){
     tab.addEventListener('click', ()=>{
       const cm = cmInstances[tab.dataset.tab];
       if(cm) setTimeout(()=>cm.refresh(), 0);
+      if(typeof buildCodeBar === 'function') buildCodeBar(tab.dataset.tab);
+      if(typeof updateUndoButtons === 'function') updateUndoButtons();
     });
   });
 }
@@ -560,10 +933,10 @@ setSrc('html',
 `<ሰነድ>
   <ራስ><አርእስት>የእኔ ገጽ</አርእስት></ራስ>
   <ሰውነት>
-    <ራስጌ><ርዕስ1>ሰላም!</ርዕስ1></ራስጌ>
+    <ራስጌ><ርዕስ1>ሰላም! ስሜ ማን ነው</ርዕስ1></ራስጌ>
     <ዋና>
-      <አንቀጽ>ይህ በአማርኛ የተሰራ ገጽ ነው።</አንቀጽ>
-      <አዝራር መደብ="ዋና-አዝራር" ሲነካ="ሰላም_በል()">ተጫነኝ</አዝራር>
+      <አንቀጽ>ይህ በአማርኛ የሠራሁት የመጀመሪያ ገጼ ነው።</አንቀጽ>
+      <አዝራር መደብ="ዋና-አዝራር" ሲነካ="ሰላም_በል()">ጫነኝ</አዝራር>
       <ክፍል መለያ="ውጤት"></ክፍል>
     </ዋና>
   </ሰውነት>
@@ -578,15 +951,15 @@ setSrc('css',
   የጀርባ-ቀለም: ሰማያዊ;
   ቀለም: ነጭ;
   ውስጠ-ክፍተት: 24px;
-  የጽሑፍ-አሰላለፍ: center;
+  የጽሑፍ-አሰላለፍ: መሃል;
 }
 .ዋና-አዝራር {
   የጀርባ-ቀለም: ብርቱካናማ;
   ቀለም: ነጭ;
-  ድንበር: none;
+  ድንበር: ምንም;
   የድንበር-ክብነት: 8px;
   ውስጠ-ክፍተት: 12px 20px;
-  ጠቋሚ-ቅርጽ: pointer;
+  ጠቋሚ-ቅርጽ: ጠቋሚ-እጅ;
 }
 .ደምቆ {
   የጀርባ-ቀለም: ቢጫ;
@@ -617,30 +990,81 @@ renderPageBar();
 // synced across devices), and is cleared if the person clears site data.
 const AUTOSAVE_KEY = 'direnya-playground-autosave-v1';
 const THEME_KEY = 'direnya-playground-theme';
-let autosaveTimer = null;
-let autosaveDotTimer = null;
 
+// Adding a theme: one block in the :root/body[data-theme="..."] CSS above,
+// plus one entry here (name shown in the picker, dots are 3 representative
+// colors just for the swatch preview — they don't have to be exhaustive).
+const THEMES = {
+  system:    { name: 'ራስ-ሰር (System)',      dots: ['#0F172A', '#FFFFFF', '#F59E0B'] },
+  dark:      { name: 'ጨለማ (Dark)',           dots: ['#0F172A', '#1E3A8A', '#F59E0B'] },
+  classic:   { name: 'ክላሲክ (Classic)',       dots: ['#0F172A', '#3DD64F', '#FF6B6B'] },
+  light:     { name: 'ብርሃን (Light)',          dots: ['#FFFFFF', '#1E3A8A', '#F59E0B'] },
+  dracula:   { name: 'ድራኩላ (Dracula)',       dots: ['#282A36', '#BD93F9', '#FF79C6'] },
+  solarized: { name: 'ሶላራይዝድ (Solarized)',   dots: ['#002B36', '#268BD2', '#CB4B16'] },
+  ocean:     { name: 'ውቂያኖስ (Ocean)',        dots: ['#0B1E2D', '#0E7490', '#22D3EE'] },
+  sunset:    { name: 'ፀሐይ መግቢያ (Sunset)',    dots: ['#2A1220', '#9D174D', '#FB923C'] },
+};
+
+function applyTheme(name){
+  if(!THEMES[name]) name = 'dark';
+  // 'system' follows the OS light/dark setting live; the choice itself is what gets remembered
+  const shown = name === 'system'
+    ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+    : name;
+  if(shown === 'dark') document.body.removeAttribute('data-theme');
+  else document.body.setAttribute('data-theme', shown);
+  try{ localStorage.setItem(THEME_KEY, name); }catch(err){}
+  renderThemeGrid(name);
+}
+if(window.matchMedia) window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function(){
+  let saved; try{ saved = localStorage.getItem(THEME_KEY); }catch(err){ saved = null; }
+  if(saved === 'system') applyTheme('system');
+});
 function applyStoredTheme(){
   let saved;
   try{ saved = localStorage.getItem(THEME_KEY); }catch(err){ saved = null; }
-  if(saved === 'light'){
-    document.body.classList.add('light-mode');
-    const btn = document.getElementById('theme-toggle');
-    if(btn) btn.textContent = '☀️';
-  }
+  applyTheme(saved || 'dark');
 }
-function toggleTheme(){
-  const isLight = document.body.classList.toggle('light-mode');
-  const btn = document.getElementById('theme-toggle');
-  if(btn) btn.textContent = isLight ? '☀️' : '🌙';
-  try{ localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark'); }catch(err){}
+function renderThemeGrid(activeName){
+  const grid = document.getElementById('theme-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  Object.keys(THEMES).forEach(function(key){
+    const t = THEMES[key];
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'theme-swatch' + (key === activeName ? ' active' : '');
+    btn.onclick = function(){ applyTheme(key); };
+    const dots = document.createElement('span');
+    dots.className = 'dots';
+    t.dots.forEach(function(c){
+      const d = document.createElement('span');
+      d.style.background = c;
+      dots.appendChild(d);
+    });
+    btn.appendChild(dots);
+    btn.appendChild(document.createTextNode(t.name));
+    grid.appendChild(btn);
+  });
 }
+function showThemeModal(){
+  let saved;
+  try{ saved = localStorage.getItem(THEME_KEY); }catch(err){ saved = null; }
+  renderThemeGrid(saved || 'dark');
+  document.getElementById('theme-modal').classList.add('show');
+}
+function hideThemeModal(){ document.getElementById('theme-modal').classList.remove('show'); }
+
+let autosaveTimer = null;
+let autosaveDotTimer = null;
 
 function autosaveNow(){
+  if(typeof VIEWER_MODE!=='undefined' && VIEWER_MODE) return;
   try{
     pages[currentPageName] = getSrc('html');
     const payload = { pages, currentPageName, css: getSrc('css'), js: getSrc('js'), savedAt: Date.now() };
     localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(payload));
+    saveActiveProject();
     const dot = document.getElementById('autosave-dot');
     if(dot){ dot.classList.add('show'); clearTimeout(autosaveDotTimer); autosaveDotTimer = setTimeout(()=>dot.classList.remove('show'), 900); }
   }catch(err){
@@ -894,6 +1318,24 @@ function ወደ_እቃ(ጽሁፍ) {
 }
 
 
+/* ---------- lists & objects ---------- */
+function ርዝመት(እቃ) { return እቃ == null ? 0 : እቃ.length; }
+function ጨምር(ዝርዝር, እሴት) { ዝርዝር.push(እሴት); return ዝርዝር; }
+function አውጣ(ዝርዝር) { return ዝርዝር.pop(); }
+function ደርድር(ዝርዝር) {
+  return ዝርዝር.sort(function (ሀ, ለ) { return typeof ሀ === 'number' && typeof ለ === 'number' ? ሀ - ለ : String(ሀ).localeCompare(String(ለ)); });
+}
+function ገልብጥ(ዝርዝር) { return ዝርዝር.slice().reverse(); }
+function ይዟል(እቃ, እሴት) { return እቃ.includes(እሴት); }
+function ማጣሪያ(ዝርዝር, ተግባር) { return ዝርዝር.filter(ተግባር); }
+function ቀይር(ዝርዝር, ተግባር) { return ዝርዝር.map(ተግባር); }
+function ድምር(ዝርዝር) { return ዝርዝር.reduce(function (ሀ, ለ) { return ሀ + ለ; }, 0); }
+function እቃ_ፍጠር() { return {}; }
+function እቃ_አስቀምጥ(እቃ, ቁልፍ, ዋጋ) { እቃ[ቁልፍ] = ዋጋ; return እቃ; }
+function እቃ_አግኝ(እቃ, ቁልፍ) { return እቃ[ቁልፍ]; }
+function ቁልፎች(እቃ) { return Object.keys(እቃ); }
+function ዋጋዎች(እቃ) { return Object.values(እቃ); }
+
 /* ---------- Latin aliases ----------
    Same functions, callable without an Amharic keyboard — e.g. tsaf(x)
    does exactly what ጻፍ(x) does, because it IS ጻፍ, just under a second
@@ -925,7 +1367,10 @@ var kwami_atfa = ቋሚ_አጥፋ;
 var zefekede = ዘፈቀደ;
 var zefekede_kutir = ዘፈቀደ_ቁጥር;
 var wede_tsihuf = ወደ_ጽሁፍ;
-var wede_iqa = ወደ_እቃ;`;
+var wede_iqa = ወደ_እቃ;
+var rtkmet = ርዝመት; var chemr = ጨምር; var awta = አውጣ; var derder = ደርድር; var gelbt = ገልብጥ;
+var yzual = ይዟል; var matsharia = ማጣሪያ; var keyir = ቀይር; var dmr = ድምር;
+var ekw_fetr = እቃ_ፍጠር; var ekw_askemt = እቃ_አስቀምጥ; var ekw_agn = እቃ_አግኝ; var kulfoch = ቁልፎች; var wagawoch = ዋጋዎች;`;
 
 // Same fix as lib/build.js: handles pages with no explicit ራስ (head)
 // section without producing a dangling, unmatched closing tag.
@@ -967,7 +1412,7 @@ function buildNavInterceptScript(){
   })();<\/script>`;
 }
 
-function buildFullHtmlForPage(name){
+function buildFullHtmlForPage(name, forPreview){
   // Whichever page is currently open in the editor should reflect
   // live, unsaved edits; every other page renders from its last-saved
   // source in `pages`.
@@ -984,7 +1429,15 @@ function buildFullHtmlForPage(name){
   warnings.push(...jw.map(w=>'[ትእዛዝ.ድር] '+w));
 
   let out = injectIntoHead(html, `<style>${css}</style>`);
-  out = injectBeforeBodyClose(out, `<script>${RUNTIME_JS}\n${js}<\/script>`);
+  lastUserJs = js;
+  if(forPreview){
+    // separate script for the student's code so a marker line lets us map browser error line numbers back to the source line
+    out = injectIntoHead(out, `<script>window.addEventListener('error',function(e){parent.postMessage({type:'direnya-error',message:e.message,line:e.lineno,base:window.__DL0},'*');});<\/script>`);
+    out = injectBeforeBodyClose(out, `<script>${RUNTIME_JS}<\/script>\n<script>/*DIRENYA_USER*/window.__DL0=(((new Error()).stack||'').match(/:(\\d+):\\d+/)||[])[1];\n${js}<\/script>`);
+    userJsMarkerLine = out.split('\n').findIndex(l => l.includes('/*DIRENYA_USER*/')) + 1;
+  } else {
+    out = injectBeforeBodyClose(out, `<script>${RUNTIME_JS}\n${js}<\/script>`);
+  }
   out = injectBeforeBodyClose(out, buildNavInterceptScript());
   if(!/<!doctype/i.test(out)) out = '<!DOCTYPE html>\n'+out;
 
@@ -1013,10 +1466,44 @@ async function resolvePreviewAssets(html){
 
 let previewedPageName = HOME_PAGE;
 
+// Escapes text before it's inserted via innerHTML — warnings/errors can
+// contain a student's own raw code (e.g. an unknown tag name), and without
+// this a warning message could itself be interpreted as HTML instead of
+// shown as plain text.
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 async function showPreviewForPage(name){
   previewedPageName = name;
-  const { fullHtml, warnings } = buildFullHtmlForPage(name);
-  const previewHtml = await resolvePreviewAssets(fullHtml);
+  const wBox = document.getElementById('warnings');
+
+  let fullHtml, warnings;
+  try {
+    ({ fullHtml, warnings } = buildFullHtmlForPage(name, true));
+    updateJsPanel(); if(typeof clearMarks==='function') clearMarks(errorMarks);
+  } catch (err) {
+    // A transpiler bug or a genuinely pathological input could throw
+    // instead of returning a warning — without this, the preview would
+    // just silently freeze with zero feedback, the worst possible outcome
+    // for a beginner. Instead: keep showing the LAST successful preview
+    // (never blank it), and surface the real error clearly.
+    console.error('Direnya build error:', err);
+    wBox.innerHTML = '✗ ' + escapeHtml('የገጹ ግንባታ አልተሳካም (build failed): ' + (err && err.message ? err.message : String(err)));
+    wBox.classList.add('show');
+    document.getElementById('status').style.color = 'var(--error)';
+    showToast('✗ ስህተት ተፈጥሯል — ኮድህን መርምር (build error — check your code)', true);
+    return;
+  }
+
+  let previewHtml;
+  try {
+    previewHtml = await resolvePreviewAssets(fullHtml);
+  } catch (err) {
+    console.error('Direnya asset-resolution error:', err);
+    showToast('✗ ፎቶ/ቪዲዮ መጫን አልተቻለም (could not load an attached photo/video)', true);
+    previewHtml = fullHtml; // still show the page, just without that asset resolved
+  }
   document.getElementById('preview').srcdoc = previewHtml;
 
   const label = document.getElementById('preview-page-label');
@@ -1024,9 +1511,8 @@ async function showPreviewForPage(name){
   const resetBtn = document.getElementById('preview-reset-btn');
   if(resetBtn) resetBtn.style.display = (name !== currentPageName) ? '' : 'none';
 
-  const wBox = document.getElementById('warnings');
   if(warnings.length){
-    wBox.innerHTML = warnings.map(w=>'⚠ '+w).join('<br>');
+    wBox.innerHTML = warnings.map(w=>'⚠ '+escapeHtml(w)).join('<br>');
     wBox.classList.add('show');
     document.getElementById('status').style.color = 'var(--secondary)';
   } else {
@@ -1074,24 +1560,29 @@ function showToast(msg, isError){
 }
 
 /* ---------- .ወብ open / save (single real file, three sections) ---------- */
-function saveWebFile(){
-  const source = serializeProject();
+async function saveWebFile(){
+  const { text: source, count: nAssets } = await serializeProjectWithAssets();
   const blob = new Blob([source], {type:'text/plain;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'የእኔ-ፕሮጀክት.ወብ';
   a.click();
   const n = Object.keys(pages).length;
-  showToast(`✓ ፕሮጀክት ተቀምጧል (${n} ገጽ${n > 1 ? 'ች' : ''})`);
+  showToast(`✓ ፕሮጀክት ተቀምጧል (${n} ገጽ${n > 1 ? 'ች' : ''}${nAssets ? ` + ${nAssets} ፎቶ/ቪዲዮ` : ''})`);
 }
 
 function openWebFile(event){
   const file = event.target.files[0];
   if(!file) return;
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     try{
-      const { pages: newPages, css, js, hadExplicitSections } = parseProjectFile(reader.result);
+      const { pages: newPages, css, js, hadExplicitSections, assets: embedded } = parseProjectFile(reader.result);
+      for(const [name, uri] of Object.entries(embedded || {})){
+        const blob = await (await fetch(uri)).blob();
+        const f = new File([blob], name, { type: blob.type });
+        assetStore.set(name, f); persistAsset(name, f);
+      }
       pages = newPages;
       if(!pages[HOME_PAGE]) pages[HOME_PAGE] = ''; // always guarantee a home page exists
       currentPageName = HOME_PAGE;
@@ -1167,15 +1658,425 @@ async function downloadForHosting(){
 
   showToast(warnings.length ? `⚠ ${warnings.length} ማስጠንቀቂያ(ዎች) ጋር ወረደ` : `✓ ZIP ተዘጋጅቷል — ${builtFiles.join(', ')}`);
 }
+
+/* ================= projects, history, sharing, autocomplete ================= */
+const PROJ_INDEX_KEY='direnya-projects-v2', PROJ_ACTIVE_KEY='direnya-active-project';
+const SHARE_BASE_URL = ''; // set to your hosted playground URL (e.g. 'https://you.github.io/direnya/playground/') so share links work from the app and from file:// copies
+let VIEWER_MODE = false;
+const lsGet=(k,d)=>{ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } };
+const lsSet=(k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } };
+const projState=()=>{ pages[currentPageName]=getSrc('html'); return {pages,currentPageName,css:getSrc('css'),js:getSrc('js')}; };
+function loadState(d){
+  pages=d.pages||{[HOME_PAGE]:''}; if(pages[HOME_PAGE]===undefined) pages[HOME_PAGE]='';
+  currentPageName=pages[d.currentPageName]!==undefined?d.currentPageName:HOME_PAGE;
+  setSrc('html',pages[currentPageName]||''); setSrc('css',d.css||''); setSrc('js',d.js||''); renderPageBar();
+  if(typeof resetUndoHistory === 'function') resetUndoHistory();
+}
+function projIndex(){ return lsGet(PROJ_INDEX_KEY,[]); }
+function activeId(){ try{ return localStorage.getItem(PROJ_ACTIVE_KEY); }catch(e){ return null; } }
+function newProjectFrom(state,name){
+  const id='p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  const idx=projIndex(); idx.unshift({id,name:name||'ፕሮጀክት '+(idx.length+1),updated:Date.now()});
+  lsSet('direnya-proj:'+id,state); lsSet(PROJ_INDEX_KEY,idx);
+  try{ localStorage.setItem(PROJ_ACTIVE_KEY,id); }catch(e){}
+  return id;
+}
+function saveActiveProject(){
+  if(VIEWER_MODE) return;
+  const id=activeId(), idx=projIndex(), st=projState();
+  if(!id||!idx.find(p=>p.id===id)){ newProjectFrom(st,'የመጀመሪያ ፕሮጀክት'); return; }
+  lsSet('direnya-proj:'+id,st);
+  idx.find(p=>p.id===id).updated=Date.now(); lsSet(PROJ_INDEX_KEY,idx);
+  takeSnapshot(id,st,false);
+}
+/* version history: automatic snapshots, newest first, max 25 per project */
+function takeSnapshot(id,st,force,label){
+  const key='direnya-snaps:'+id, snaps=lsGet(key,[]), blob=JSON.stringify(st);
+  if(snaps[0]&&JSON.stringify(snaps[0].data)===blob) return;
+  if(!force&&snaps[0]&&Date.now()-snaps[0].t<120000) return;
+  snaps.unshift({t:Date.now(),label:label||'',data:st});
+  while(snaps.length>25) snaps.pop();
+  while(!lsSet(key,snaps)&&snaps.length>1) snaps.pop();
+}
+function switchProject(id){
+  saveActiveProject();
+  const d=lsGet('direnya-proj:'+id,null); if(!d) return;
+  try{ localStorage.setItem(PROJ_ACTIVE_KEY,id); }catch(e){}
+  loadState(d); runProgram(); hideModal('projects-modal'); showToast('✓ ፕሮጀክት ተከፍቷል');
+}
+function createProject(){
+  saveActiveProject();
+  newProjectFrom({pages:{[HOME_PAGE]:''},currentPageName:HOME_PAGE,css:'',js:''}, prompt('የፕሮጀክት ስም (project name)','አዲስ ፕሮጀክት')||'አዲስ ፕሮጀክት');
+  loadState({pages:{[HOME_PAGE]:''}}); runProgram(); renderProjects();
+}
+function renameProject(id){ const idx=projIndex(), p=idx.find(x=>x.id===id); const n=prompt('አዲስ ስም',p.name); if(n){ p.name=n; lsSet(PROJ_INDEX_KEY,idx); renderProjects(); } }
+function duplicateProject(id){ saveActiveProject(); const p=projIndex().find(x=>x.id===id); newProjectFrom(lsGet('direnya-proj:'+id,{}),p.name+' (ቅጂ)'); switchProjectByActive(); }
+function switchProjectByActive(){ const id=activeId(); loadState(lsGet('direnya-proj:'+id,{})); runProgram(); renderProjects(); }
+function deleteProject(id){
+  if(!confirm('ይህን ፕሮጀክት ማጥፋት ይፈልጋሉ? Delete this project for good?')) return;
+  let idx=projIndex().filter(p=>p.id!==id); lsSet(PROJ_INDEX_KEY,idx);
+  try{ localStorage.removeItem('direnya-proj:'+id); localStorage.removeItem('direnya-snaps:'+id); }catch(e){}
+  if(activeId()===id){
+    if(!idx.length){ clearAutosaveAndReset(); newProjectFrom(projState(),'አዲስ ፕሮጀክት'); }
+    else { try{ localStorage.setItem(PROJ_ACTIVE_KEY,idx[0].id); }catch(e){} switchProjectByActive(); return; }
+  }
+  renderProjects();
+}
+function showModal(id){ document.getElementById(id).classList.add('show'); }
+function hideModal(id){ document.getElementById(id).classList.remove('show'); }
+function mkBtn(label,fn,cls){ const b=document.createElement('button'); b.type='button'; b.textContent=label; b.className=cls||'btn-dl'; b.style.padding='4px 9px'; b.onclick=fn; return b; }
+function renderProjects(){
+  const box=document.getElementById('projects-list'); box.innerHTML=''; const act=activeId();
+  projIndex().forEach(p=>{
+    const row=document.createElement('div'); row.style.cssText='display:flex;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);flex-wrap:wrap';
+    const nm=document.createElement('span'); nm.style.cssText='flex:1;min-width:120px;font-weight:600'; nm.textContent=(p.id===act?'● ':'')+p.name; row.appendChild(nm);
+    row.appendChild(mkBtn('ክፈት',()=>switchProject(p.id),'btn-run'));
+    row.appendChild(mkBtn('✎',()=>renameProject(p.id))); row.appendChild(mkBtn('⧉',()=>duplicateProject(p.id))); row.appendChild(mkBtn('🗑',()=>deleteProject(p.id)));
+    box.appendChild(row);
+  });
+}
+function showProjects(){ saveActiveProject(); renderProjects(); showModal('projects-modal'); }
+function showHistory(){
+  saveActiveProject(); const id=activeId(), snaps=lsGet('direnya-snaps:'+id,[]), box=document.getElementById('history-list'); box.innerHTML='';
+  if(!snaps.length) box.textContent='ገና ምንም የለም (no snapshots yet)';
+  snaps.forEach((s,i)=>{
+    const row=document.createElement('div'); row.style.cssText='display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)';
+    const t=document.createElement('span'); t.style.flex='1'; t.textContent=new Date(s.t).toLocaleString()+(s.label?' · '+s.label:''); row.appendChild(t);
+    row.appendChild(mkBtn('↶ መልስ (Restore)',()=>{ takeSnapshot(id,projState(),true,'ከመመለስ በፊት'); loadState(s.data); runProgram(); hideModal('history-modal'); showToast('✓ ተመልሷል'); },'btn-run'));
+    box.appendChild(row);
+  });
+  showModal('history-modal');
+}
+/* ---------- share links: whole project compressed into the URL hash (no server) ---------- */
+const b64u=bytes=>{ let s=''; bytes.forEach(b=>s+=String.fromCharCode(b)); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); };
+const unb64u=str=>{ const s=atob(str.replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(s,c=>c.charCodeAt(0)); };
+async function pipeBytes(bytes,stream){ const w=stream.writable.getWriter(); w.write(bytes); w.close(); return new Uint8Array(await new Response(stream.readable).arrayBuffer()); }
+async function encodeProject(){
+  const raw=new TextEncoder().encode(serializeProject());
+  if(typeof CompressionStream==='function'){ try{ return 'z'+b64u(await pipeBytes(raw,new CompressionStream('deflate-raw'))); }catch(e){} }
+  return 'u'+b64u(raw);
+}
+async function decodeProject(code){
+  let bytes=unb64u(code.slice(1));
+  if(code[0]==='z') bytes=await pipeBytes(bytes,new DecompressionStream('deflate-raw'));
+  return new TextDecoder().decode(bytes);
+}
+async function showShare(){
+  const code=await encodeProject();
+  let base=SHARE_BASE_URL||(location.origin+location.pathname); base=base.split('#')[0];
+  const edit=base+'#p='+code, view=base+'#p='+code+'&v=1';
+  const note=[];
+  if(location.protocol==='file:'&&!SHARE_BASE_URL) note.push('⚠ ይህ ፋይል ከኮምፒውተርህ ላይ ተከፍቷል — ሊንኩ ለሌሎች እንዲሰራ ፕሌይግራውንዱን ድር ላይ አስተናግድ (host it, then set SHARE_BASE_URL). This link only works on your own device until the playground is hosted.');
+  if(assetStore.size) note.push('⚠ ፎቶ/ቪዲዮዎች በሊንክ አይካተቱም (photos/videos are not included in links).');
+  if(view.length>8000) note.push('⚠ ሊንኩ በጣም ረጅም ነው ('+view.length+' ፊደል) — አንዳንድ መተግበሪያዎች ሊቆርጡት ይችላሉ.');
+  document.getElementById('share-note').innerHTML=note.map(escapeHtml).join('<br>');
+  const box=document.getElementById('share-links'); box.innerHTML='';
+  [['👀 ለማየት ብቻ (view only — shows the finished page)',view],['✎ ለማርትዕ (edit — opens as a copy in the editor)',edit]].forEach(([label,url])=>{
+    const w=document.createElement('div'); w.style.margin='10px 0';
+    const l=document.createElement('div'); l.textContent=label; l.style.cssText='font-weight:600;font-size:.85rem;margin-bottom:4px'; w.appendChild(l);
+    const inp=document.createElement('input'); inp.readOnly=true; inp.value=url; inp.style.cssText='width:100%;padding:6px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)'; inp.onfocus=()=>inp.select(); w.appendChild(inp);
+    const row=document.createElement('div'); row.style.cssText='display:flex;gap:6px;margin-top:5px';
+    row.appendChild(mkBtn('📋 ቅዳ (Copy)',async()=>{ try{ await navigator.clipboard.writeText(url); }catch(e){ inp.select(); document.execCommand('copy'); } showToast('✓ ሊንክ ተቀድቷል'); },'btn-run'));
+    if(navigator.share) row.appendChild(mkBtn('↗ አጋራ (Share)',()=>navigator.share({title:'ድርኛ',url}).catch(()=>{})));
+    w.appendChild(row); box.appendChild(w);
+  });
+  showModal('share-modal');
+}
+async function openFromHash(){
+  const m=/^#p=([zu][A-Za-z0-9_-]+)(&v=1)?$/.exec(location.hash); if(!m) return false;
+  try{
+    const parsed=parseProjectFile(await decodeProject(m[1]));
+    const st={pages:parsed.pages,currentPageName:HOME_PAGE,css:parsed.css,js:parsed.js};
+    if(m[2]){ VIEWER_MODE=true; loadState(st); showViewer(st); return true; }
+    saveActiveProject(); newProjectFrom(st,'የተጋራ ፕሮጀክት'); loadState(st); history.replaceState(null,'',location.pathname+location.search);
+    showToast('✓ የተጋራ ፕሮጀክት እንደ አዲስ ቅጂ ተከፍቷል'); return true;
+  }catch(e){ console.warn('bad share link',e); showToast('✗ ሊንኩ ተበላሽቷል (invalid share link)',true); return false; }
+}
+function showViewer(st){
+  const { fullHtml } = buildFullHtmlForPage(HOME_PAGE);
+  const ov=document.createElement('div'); ov.style.cssText='position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;background:#fff';
+  const bar=document.createElement('div'); bar.style.cssText='background:var(--panel);color:var(--text);padding:8px 14px;display:flex;gap:10px;align-items:center;font-size:.85rem';
+  bar.innerHTML='<span style="flex:1">ድ በድርኛ የተሠራ ገጽ (made with Direnya)</span>';
+  bar.appendChild(mkBtn('✎ አርትዕ (Edit a copy)',()=>{ VIEWER_MODE=false; newProjectFrom(st,'የተጋራ ፕሮጀክት'); ov.remove(); history.replaceState(null,'',location.pathname+location.search); runProgram(); },'btn-run'));
+  const fr=document.createElement('iframe'); fr.setAttribute('sandbox','allow-scripts allow-modals'); fr.style.flex='1'; fr.srcdoc=fullHtml;
+  ov.appendChild(bar); ov.appendChild(fr); document.body.appendChild(ov);
+}
+/* ---------- autocomplete (CodeMirror show-hint; silently absent offline) ---------- */
+const HINT_GLOSS = {"ካሆነ": "if", "ካልሆነ": "else", "ወይም": "else if", "ድገም": "repeat", "ጊዜ": "times", "እያንዳንዱ": "for each", "በ": "in", "ተግባር": "function", "ጨርስ": "end", "መልስ": "return", "እውነት": "true", "ሐሰት": "false", "ርዝመት": "length", "ጨምር": "add to list", "አውጣ": "remove last", "ደርድር": "sort", "ገልብጥ": "reverse", "ይዟል": "contains", "ማጣሪያ": "filter", "ቀይር": "map", "ድምር": "sum", "እቃ_ፍጠር": "new object", "እቃ_አስቀምጥ": "set key", "እቃ_አግኝ": "get key", "ቁልፎች": "keys", "ዋጋዎች": "values", "ጻፍ": "write", "አሳውቅ": "alert", "አትም": "console.log", "ንጥል_በመለያ": "get element by id", "በመለያ": "get element by id", "ንጥሎች_በመደብ": "get by class", "በመደብ": "get by class", "ጽሑፍ_አስቀምጥ": "set text", "ጽሑፍ_አ": "set text", "ጽሑፍ_አግኝ": "get text", "ስልት_አስቀምጥ": "set style", "ስልት_አ": "set style", "መደብ_ጨምር": "add class", "መደብ_አስወግድ": "remove class", "መደብ_ቀያይር": "toggle class", "መደብ_ቀ": "toggle class", "ዋጋ_አግኝ": "get value", "ዋጋ_አስቀምጥ": "set value", "ስማ": "on event", "አምጣ": "fetch data", "ጠብቅ": "wait, then", "ቋሚ_አስቀምጥ": "save", "ቋሚ_አግኝ": "load", "ቋሚ_አጥፋ": "delete saved", "ዘፈቀደ": "random 0–1", "ዘፈቀደ_ቁጥር": "random number", "ወደ_ጽሁፍ": "to text", "ወደ_እቃ": "from text"};
+const isEth = k => /[\u1200-\u137F]/.test(k);
+// one entry per Amharic word: { w, gloss (English meaning), also: [Latin spellings that should also match] } — built once per dictionary table
+const _entryCache = new Map();
+function entriesOf(table){
+  if(_entryCache.has(table)) return _entryCache.get(table);
+  const latinByValue = {}; Object.keys(table).forEach(k => { if(!isEth(k)) (latinByValue[table[k]] = latinByValue[table[k]] || []).push(k); });
+  const out = Object.keys(table).filter(isEth).map(w => ({ w, gloss: table[w], also: latinByValue[table[w]] || [] }));
+  _entryCache.set(table, out); return out;
+}
+function direnyaWords(tab,cm){
+  const D=window.DIRENYA, cur=cm.getCursor(), before=cm.getLine(cur.line).slice(0,cur.ch);
+  if(tab==='html'){
+    if(/<\/?[^\s<>\/]*$/.test(before)) return entriesOf(D.TAGS);
+    if(/<[^<>]*\s[^\s=<>"']*$/.test(before)) return entriesOf(D.ATTRS);
+    return [];
+  }
+  if(tab==='css'){
+    if(/:[^;{}]*$/.test(before)) return entriesOf(D.CSS_COLOR_VALUES);
+    return entriesOf(D.CSS_PROPS);
+  }
+  const out=[];
+  [D.JS_KEYWORD_ALIASES,D.RUNTIME_ALIASES].forEach(t=>Object.keys(t).forEach(w=>out.push({w, also:[t[w]], gloss:HINT_GLOSS[w]||''})));
+  const SN={"ካሆነ": "if", "ካልሆነ": "else", "ድገም": "repeat", "እያንዳንዱ": "for each", "ተግባር": "function", "ስማ": "on event"};
+  [['ካሆነ','ካሆነ ሁኔታ\n  \nጨርስ'],['ድገም','ድገም 3 ጊዜ\n  \nጨርስ'],['እያንዳንዱ','እያንዳንዱ ንጥል በ ዝርዝር\n  \nጨርስ'],['ተግባር','ተግባር ስም()\n  \nጨርስ'],['ስማ','ስማ(አዝራር, "ጠቅታ", ተግባር()\n  \nጨርስ)']].forEach(([w,snip])=>out.push({w, snip, also:[D.JS_KEYWORD_ALIASES[w]||D.RUNTIME_ALIASES[w]||''], gloss:SN[w]}));
+  return out;
+}
+// each suggestion row: the Amharic word, its English meaning on the right, and a small "block" badge for templates
+function renderHint(el, self, data){
+  const w=document.createElement('span'); w.className='hint-w'; w.textContent=data.word; el.appendChild(w);
+  if(data.snip){ const b=document.createElement('span'); b.className='hint-b'; b.textContent='ብሎክ'; el.appendChild(b); }
+  if(data.gloss){ const g=document.createElement('span'); g.className='hint-g'; g.textContent=data.gloss; el.appendChild(g); }
+}
+function direnyaHint(cm){
+  const tab=Object.keys(cmInstances).find(k=>cmInstances[k]===cm), cur=cm.getCursor(), line=cm.getLine(cur.line);
+  let s=cur.ch; while(s>0&&/[\w\u1200-\u137F\-]/.test(line[s-1])) s--;
+  const typed=line.slice(s,cur.ch); if(!typed&&!/<\/?$/.test(line.slice(0,cur.ch))) return null;
+  const low=typed.toLowerCase(), latin=/^[a-z']+$/i.test(typed), TR=window.DIRENYA_TRANSLIT, seen=new Set(), list=[];
+  direnyaWords(tab,cm).forEach(e=>{
+    // how well does this word fit what was typed?  0 = Amharic letters   1-3 = SOUNDS like it ("sewenet" -> ሰውነት)   4 = Latin spelling   5 = English meaning
+    let score=-1;
+    if(e.w.startsWith(typed)) score=0;
+    else if(latin&&TR&&TR.matchesLatin(typed,e.w)) score=1+TR.rank(typed,e.w);
+    else if((e.also||[]).some(a=>a&&a.toLowerCase().startsWith(low))) score=4;
+    else if(e.gloss&&e.gloss.toLowerCase().startsWith(low)) score=5;
+    if(score<0||(e.w===typed&&!e.snip)) return;
+    const k=(e.snip?'S':'W')+e.w; if(seen.has(k)) return; seen.add(k);
+    list.push({text:e.snip||e.w, word:e.w, gloss:e.gloss||'', snip:!!e.snip, score, render:renderHint});
+  });
+  list.sort((a,b)=>(b.snip-a.snip)||a.score-b.score||a.word.length-b.word.length);
+  return list.length?{list:list.slice(0,30),from:CodeMirror.Pos(cur.line,s),to:cur}:null;
+}
+function wireAutocomplete(){
+  if(typeof CodeMirror==='undefined'||!CodeMirror.showHint) return;
+  Object.values(cmInstances).forEach(cm=>{
+    cm.on('inputRead',(c,ch)=>{ if(!c.state.completionActive&&/[\w\u1200-\u137F<\-]/.test(ch.text[0]||'')) c.showHint({hint:direnyaHint,completeSingle:false}); });
+    cm.addKeyMap({'Ctrl-Space':c=>c.showHint({hint:direnyaHint,completeSingle:false})});
+  });
+}
+
+
+/* ================= errors in Amharic, squiggles, JS panel, device preview, templates ================= */
+let lastUserJs = '', userJsMarkerLine = 0;
+
+// Turns a raw browser error into a short Amharic explanation (+ the original English in brackets).
+function explainError(msg){
+  let m;
+  if((m = /^(?:(?:Uncaught )?ReferenceError: )?(\S+) is not defined/.exec(msg))) return `"${m[1]}" አልተፈጠረም — ስሙን በትክክል ጻፍከው? መጀመሪያ እሴት ስጠው።`;
+  if((m = /Cannot (?:read|set) propert(?:y|ies) of (null|undefined)(?: \((?:reading|setting) '([^']*)'\))?/.exec(msg))) return `እቃው አልተገኘም (${m[1]})${m[2] ? ' — "' + m[2] + '" ማግኘት አልተቻለም' : ''}። ንጥል_በመለያ("…") ውስጥ ያለው መለያ ከ HTML መለያ ጋር ይመሳሰላል?`;
+  if((m = /^(?:(?:Uncaught )?TypeError: )?(.+) is not a function/.exec(msg))) return `"${m[1]}" ተግባር አይደለም — የተግባሩን ስም ወይም ቅንፉን አረጋግጥ።`;
+  if(/Assignment to constant/.test(msg)) return 'የማይቀየር እሴት ለመቀየር ሞክረሃል።';
+  if(/^(?:Uncaught )?SyntaxError/.test(msg)) return 'የአጻጻፍ ስህተት — ጨርስ፣ ቅንፍ ( ) ወይም ጥቅስ " " ሳይዘጋ ቀርቷል?';
+  if(/Maximum call stack/.test(msg)) return 'ተግባሩ ራሱን ያለማቋረጥ ይጠራል — መጨረሻ የሌለው ድግግሞሽ።';
+  return 'ስህተት ተፈጥሯል።';
+}
+window.addEventListener('message', function(e){
+  const d = e.data; if(!d || d.type !== 'direnya-error') return;
+  // browsers differ on whether inline-script error lines are document- or script-relative, so the page reports its own probe line (base)
+  const srcLine = d.line - (d.base ? Number(d.base) : userJsMarkerLine);
+  const lines = lastUserJs ? lastUserJs.split('\n').length : 0;
+  const where = (srcLine >= 1 && srcLine <= lines) ? `ትእዛዝ.ድር — መስመር ${srcLine}: ` : '';
+  const box = document.getElementById('warnings');
+  box.innerHTML += (box.innerHTML ? '<br>' : '') + '✗ ' + escapeHtml(where + explainError(d.message)) + ' <span style="opacity:.6">[' + escapeHtml(d.message) + ']</span>';
+  box.classList.add('show');
+  document.getElementById('status').style.color = 'var(--error)';
+  if(srcLine >= 1 && srcLine <= lines) flagLine(srcLine, explainError(d.message));
+});
+let errorMarks = [], problemMarks = [];
+function flagLine(n, text){
+  const cm = cmInstances.js; if(!cm) return;
+  errorMarks.push(cm.markText({line:n-1, ch:0}, {line:n-1, ch:cm.getLine(n-1).length || 1}, {className:'cm-squiggle', title:text}));
+}
+function clearMarks(list){ list.splice(0).forEach(m => m.clear()); }
+function refreshSquiggles(){
+  const cm = cmInstances.js; if(!cm) return;
+  clearMarks(problemMarks);
+  let problems = []; try{ problems = transpileJS(cm.getValue()).problems || []; }catch(e){}
+  problems.forEach(p => {
+    const len = cm.getLine(p.line-1) != null ? cm.getLine(p.line-1).length : 0;
+    problemMarks.push(cm.markText({line:p.line-1, ch:0}, {line:p.line-1, ch:len || 1}, {className:'cm-squiggle', title:p.message}));
+  });
+}
+let squiggleTimer = null;
+function wireSquiggles(){
+  const cm = cmInstances.js; if(!cm) return;
+  cm.on('change', () => { clearMarks(errorMarks); clearTimeout(squiggleTimer); squiggleTimer = setTimeout(refreshSquiggles, 500); });
+  refreshSquiggles();
+}
+/* "show me the JavaScript" panel */
+function toggleJsPanel(){
+  const p = document.getElementById('js-panel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; updateJsPanel();
+}
+function updateJsPanel(){ const p = document.getElementById('js-panel'); if(p) p.textContent = lastUserJs || '// (ምንም ትእዛዝ የለም — no JavaScript yet)'; }
+/* responsive preview toggle */
+let deviceWidth = 0;
+function setDevice(w){
+  deviceWidth = w || 0;
+  const stage = document.getElementById('preview-stage'), f = document.getElementById('preview'), label = document.getElementById('device-label');
+  if(!deviceWidth){
+    stage.classList.remove('device'); f.style.width = ''; f.style.height = ''; f.style.transform = ''; if(label) label.textContent = '';
+  } else {
+    stage.classList.add('device');
+    const sw = stage.clientWidth, sh = stage.clientHeight - 10;
+    const k = Math.max(0.3, Math.min(1, (sw - 20) / deviceWidth));      // shrink to fit the pane, never enlarge
+    f.style.width = deviceWidth + 'px'; f.style.height = Math.floor(sh / k) + 'px'; f.style.transform = k < 1 ? 'scale(' + k + ')' : '';
+    if(label) label.textContent = deviceWidth + 'px' + (k < 1 ? ' · ' + Math.round(k * 100) + '%' : '');
+  }
+  document.querySelectorAll('.dev-btn').forEach(b => b.classList.toggle('active', String(b.dataset.w || '') === String(deviceWidth || '')));
+}
+window.addEventListener('resize', () => { if(deviceWidth) setDevice(deviceWidth); });
+/* starter templates — each opens as a NEW project, so nothing you have is overwritten */
+const TEMPLATES = [
+  { name:'🔢 ቆጣሪ (Counter)',
+    html:'<ሰነድ>\n  <ራስ><አርእስት>ቆጣሪ</አርእስት></ራስ>\n  <ሰውነት>\n    <ርዕስ1 መለያ="ቁጥር">0</ርዕስ1>\n    <አዝራር መለያ="ጨምር-አዝራር">ጨምር</አዝራር>\n    <አዝራር መለያ="አጥፋ-አዝራር">ወደ 0 መልስ</አዝራር>\n  </ሰውነት>\n</ሰነድ>',
+    js:'ብዛት = 0\nቁጥር_እቃ = ንጥል_በመለያ("ቁጥር")\nስማ(ንጥል_በመለያ("ጨምር-አዝራር"), "ጠቅታ", ተግባር()\n  ብዛት = ብዛት + 1\n  ጽሑፍ_አስቀምጥ(ቁጥር_እቃ, ብዛት)\nጨርስ)\nስማ(ንጥል_በመለያ("አጥፋ-አዝራር"), "ጠቅታ", ተግባር()\n  ብዛት = 0\n  ጽሑፍ_አስቀምጥ(ቁጥር_እቃ, ብዛት)\nጨርስ)' },
+  { name:'👋 ሰላምታ (Greeting)',
+    html:'<ሰነድ>\n  <ራስ><አርእስት>ሰላምታ</አርእስት></ራስ>\n  <ሰውነት>\n    <ርዕስ1>ስምህ ማነው?</ርዕስ1>\n    <ማስገቢያ መለያ="ስም-ሳጥን" ጠቋሚ="ስምህን ጻፍ" />\n    <አዝራር መለያ="ሰላም-አዝራር">ሰላም በለኝ</አዝራር>\n    <አንቀጽ መለያ="ሰላምታ"></አንቀጽ>\n  </ሰውነት>\n</ሰነድ>',
+    js:'ስማ(ንጥል_በመለያ("ሰላም-አዝራር"), "ጠቅታ", ተግባር()\n  ስሜ = ዋጋ_አግኝ(ንጥል_በመለያ("ስም-ሳጥን"))\n  ጽሑፍ_አስቀምጥ(ንጥል_በመለያ("ሰላምታ"), "ሰላም፣ " + ስሜ + "!")\nጨርስ)' },
+  { name:'📝 የሥራ ዝርዝር (To-do list)',
+    html:'<ሰነድ>\n  <ራስ><አርእስት>የሥራ ዝርዝር</አርእስት></ራስ>\n  <ሰውነት>\n    <ርዕስ1>የሥራ ዝርዝር</ርዕስ1>\n    <ማስገቢያ መለያ="አዲስ-ሥራ" ጠቋሚ="አዲስ ሥራ ጻፍ" />\n    <አዝራር መለያ="ጨምር-አዝራር">ጨምር</አዝራር>\n    <ዝርዝር መለያ="ዝርዝር-ሳጥን"></ዝርዝር>\n  </ሰውነት>\n</ሰነድ>',
+    js:'ሥራዎች = []\nዝርዝር_እቃ = ንጥል_በመለያ("ዝርዝር-ሳጥን")\nተግባር አሳይ()\n  ጽሑፍ_አስቀምጥ(ዝርዝር_እቃ, "")\n  እያንዳንዱ ሥራ በ ሥራዎች\n    አዲስ_ንጥል = document.createElement("li")\n    አዲስ_ንጥል.textContent = ሥራ\n    ዝርዝር_እቃ.appendChild(አዲስ_ንጥል)\n  ጨርስ\nጨርስ\nስማ(ንጥል_በመለያ("ጨምር-አዝራር"), "ጠቅታ", ተግባር()\n  ሳጥን = ንጥል_በመለያ("አዲስ-ሥራ")\n  ጽሑፍ = ዋጋ_አግኝ(ሳጥን)\n  ካሆነ ርዝመት(ጽሑፍ) > 0\n    ጨምር(ሥራዎች, ጽሑፍ)\n    ዋጋ_አስቀምጥ(ሳጥን, "")\n    አሳይ()\n  ጨርስ\nጨርስ)' },
+  { name:'❓ ጥያቄ (Quiz)',
+    html:'<ሰነድ>\n  <ራስ><አርእስት>ጥያቄ</አርእስት></ራስ>\n  <ሰውነት>\n    <ርዕስ1 መለያ="ጥያቄ-ጽሑፍ"></ርዕስ1>\n    <አዝራር መለያ="መልስ-ሀ">አዲስ አበባ</አዝራር>\n    <አዝራር መለያ="መልስ-ለ">ባሕር ዳር</አዝራር>\n    <አንቀጽ መለያ="ውጤት"></አንቀጽ>\n  </ሰውነት>\n</ሰነድ>',
+    js:'ጽሑፍ_አስቀምጥ(ንጥል_በመለያ("ጥያቄ-ጽሑፍ"), "የኢትዮጵያ ዋና ከተማ ማን ናት?")\nተግባር ፈትሽ(መልሴ)\n  ካሆነ መልሴ == "አዲስ አበባ"\n    ጽሑፍ_አስቀምጥ(ንጥል_በመለያ("ውጤት"), "✓ ትክክል!")\n  ካልሆነ\n    ጽሑፍ_አስቀምጥ(ንጥል_በመለያ("ውጤት"), "✗ እንደገና ሞክር")\n  ጨርስ\nጨርስ\nስማ(ንጥል_በመለያ("መልስ-ሀ"), "ጠቅታ", ተግባር()\n  ፈትሽ("አዲስ አበባ")\nጨርስ)\nስማ(ንጥል_በመለያ("መልስ-ለ"), "ጠቅታ", ተግባር()\n  ፈትሽ("ባሕር ዳር")\nጨርስ)' },
+];
+const TEMPLATE_CSS = 'ሰውነት {\n  የፊደል-ዓይነት: sans-serif;\n  የጽሑፍ-አሰላለፍ: መሃል;\n  ውስጠ-ክፍተት: 24px;\n}\nአዝራር {\n  ውስጠ-ክፍተት: 10px 18px;\n  የፊደል-መጠን: 16px;\n}';
+function showTemplates(){
+  const box = document.getElementById('templates-list'); box.innerHTML = '';
+  TEMPLATES.forEach((t, i) => { const b = mkBtn(t.name, () => useTemplate(i), 'btn-dl'); b.style.cssText += ';display:block;width:100%;margin:6px 0;text-align:left;padding:10px 12px'; box.appendChild(b); });
+  showModal('templates-modal');
+}
+function useTemplate(i){
+  const t = TEMPLATES[i]; saveActiveProject();
+  const st = { pages:{ [HOME_PAGE]: t.html }, currentPageName: HOME_PAGE, css: TEMPLATE_CSS, js: t.js };
+  newProjectFrom(st, t.name.replace(/^\S+\s/, ''));
+  loadState(st); runProgram(); hideModal('templates-modal'); showToast('✓ አዲስ ፕሮጀክት ተፈጥሯል — ቀይረው ሞክር!');
+}
+
+/* ================= undo / redo buttons (use the active editor's own history) ================= */
+function activeTabName(){ const t = document.querySelector('.tab.active'); return t ? t.dataset.tab : 'html'; }
+function doUndo(){ const cm = cmInstances[activeTabName()]; if(cm){ cm.undo(); cm.focus(); } else document.execCommand('undo'); updateUndoButtons(); }
+function doRedo(){ const cm = cmInstances[activeTabName()]; if(cm){ cm.redo(); cm.focus(); } else document.execCommand('redo'); updateUndoButtons(); }
+function updateUndoButtons(){
+  const cm = cmInstances[activeTabName()], u = document.getElementById('undo-btn'), r = document.getElementById('redo-btn'); if(!u || !r) return;
+  if(!cm){ u.disabled = r.disabled = false; return; }
+  const h = cm.historySize(); u.disabled = h.undo === 0; r.disabled = h.redo === 0;
+}
+function resetUndoHistory(){ Object.values(cmInstances).forEach(cm => cm.clearHistory && cm.clearHistory()); updateUndoButtons(); }
+function wireUndoButtons(){ Object.values(cmInstances).forEach(cm => cm.on('change', updateUndoButtons)); updateUndoButtons(); }
+
+/* ================= bottom code bar: tap to insert keywords, tags and symbols (cursor lands where the | is) ================= */
+const CB_SYMBOLS = ['(', ')', '"', '=', '+', '-', '*', '/', '>', '<', '[', ']', '{', '}', ',', '.', ':', ';', '#'];
+const CB_JS = [
+  ['▸ ካሆነ','ካሆነ |\n  \nጨርስ','kw'], ['▸ ካልሆነ','ካልሆነ\n  |','kw'], ['▸ ድገም','ድገም 3 ጊዜ\n  |\nጨርስ','kw'], ['▸ እያንዳንዱ','እያንዳንዱ ንጥል በ ዝርዝር\n  |\nጨርስ','kw'],
+  ['▸ ተግባር','ተግባር ስም()\n  |\nጨርስ','kw'], ['▸ ስማ','ስማ(ንጥል_በመለያ("|"), "ጠቅታ", ተግባር()\n  \nጨርስ)','kw'], ['ጨርስ','ጨርስ','kw'],
+  ['ጻፍ','ጻፍ(|)',''], ['ንጥል_በመለያ','ንጥል_በመለያ("|")',''], ['ጽሑፍ_አስቀምጥ','ጽሑፍ_አስቀምጥ(|, )',''], ['ዋጋ_አግኝ','ዋጋ_አግኝ(|)','']
+];
+function codeBarItems(tab){
+  const D = window.DIRENYA, out = [];
+  if(tab === 'html'){
+    ['ሰነድ','ራስ','አርእስት','ሰውነት','ርዕስ1','አንቀጽ','አዝራር','ማስገቢያ','ክፍል','ምስል','ዝርዝር','ንጥል','አገናኝ'].filter(t => D.TAGS[t]).forEach(t => out.push(['<'+t+'>', '<'+t+'>|</'+t+'>', 'tag']));
+  } else if(tab === 'css'){
+    ['የጀርባ-ቀለም','ቀለም','የፊደል-መጠን','ውስጠ-ክፍተት','የጽሑፍ-አሰላለፍ','ድንበር'].filter(t => D.CSS_PROPS[t]).forEach(t => out.push([t, t+': |;', 'prop']));
+    out.push(['{ }', ' {\n  |\n}', 'sym']);
+  } else CB_JS.forEach(x => out.push(x));
+  CB_SYMBOLS.forEach(c => out.push([c, c === '"' ? '"|"' : c === '(' ? '(|)' : c, 'sym']));
+  return out;
+}
+function buildCodeBar(tab){
+  const bar = document.getElementById('code-bar'); if(!bar) return; bar.innerHTML = '';
+  codeBarItems(tab).forEach(([label, text, kind]) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'cb ' + (kind || ''); b.textContent = label;
+    b.onmousedown = e => e.preventDefault();          // keep the editor focused so the cursor stays put
+    b.onclick = () => insertSnippet(tab, text);
+    bar.appendChild(b);
+  });
+}
+function insertSnippet(tab, snippet){
+  const bar = snippet.indexOf('|'), clean = bar >= 0 ? snippet.slice(0, bar) + snippet.slice(bar + 1) : snippet, back = bar >= 0 ? clean.length - bar : 0;
+  const cm = cmInstances[tab];
+  if(cm){
+    cm.replaceSelection(clean, 'end');
+    if(back){ const c = cm.getCursor(); cm.setCursor(cm.posFromIndex(cm.indexFromPos(c) - back)); }
+    cm.focus();
+  } else {
+    const ta = document.getElementById('src-' + tab), st = ta.selectionStart, en = ta.selectionEnd;
+    ta.value = ta.value.slice(0, st) + clean + ta.value.slice(en);
+    ta.selectionStart = ta.selectionEnd = st + clean.length - back;
+    ta.dispatchEvent(new Event('input')); ta.focus();
+  }
+}
+
+/* ================= mobile app: tabs, welcome, install, offline ================= */
+const isMobileLayout = () => window.matchMedia && window.matchMedia('(max-width:760px)').matches;
+function mobTab(t){
+  const m = document.querySelector('main'); if(!m || !isMobileLayout()) return;
+  m.classList.toggle('show-code', t === 'code'); m.classList.toggle('show-preview', t === 'preview');
+  document.querySelectorAll('#mobile-tabs button').forEach(b => b.classList.toggle('active', b.dataset.t === t));
+  if(t === 'code') Object.values(cmInstances).forEach(cm => cm.refresh && cm.refresh());
+}
+const WELCOME = [
+  ['👋', 'ሰላም! ድርኛ ገጽ እና ፕሮግራም በአማርኛ የምትሠራበት ቦታ ነው።', 'Write web pages and programs using Amharic words.'],
+  ['✎ → ▶ → 👁', 'ኮድ ጻፍ፣ ▶ ተጫን፣ ውጤቱን እይ።', 'Type your code, press ▶, see your page.'],
+  ['🔗 🕘 💾', 'ሥራህ በራሱ ይቀመጣል። 🔗 ሊንክ ላክ፤ 🕘 ወደ ቀድሞው ተመለስ።', 'Your work saves itself. Share a link with 🔗, go back in time with 🕘.']
+];
+let welcomeStep = 0;
+function showWelcome(){ welcomeStep = 0; renderWelcome(); showModal('welcome-modal'); }
+function endWelcome(useCounter){
+  try{ localStorage.setItem('direnya-onboarded', '1'); }catch(e){}
+  hideModal('welcome-modal'); if(useCounter) useTemplate(0);
+}
+function renderWelcome(){
+  const [icon, am, en] = WELCOME[welcomeStep], body = document.getElementById('welcome-body');
+  body.innerHTML = '';
+  const i = document.createElement('div'); i.style.cssText = 'font-size:2.2rem;margin:6px 0'; i.textContent = icon;
+  const a = document.createElement('div'); a.style.cssText = 'font-size:1.05rem;font-weight:600;margin:6px 0'; a.textContent = am;
+  const e = document.createElement('div'); e.style.cssText = 'font-size:.85rem;color:var(--muted)'; e.textContent = en;
+  body.append(i, a, e);
+  if(welcomeStep === WELCOME.length - 1 && /iPhone|iPad|iPod/.test(navigator.userAgent)){
+    const t = document.createElement('div'); t.style.cssText = 'font-size:.78rem;color:var(--muted);margin-top:8px'; t.textContent = 'iPhone: Share ⬆ → "Add to Home Screen" to install.'; body.appendChild(t);
+  }
+  document.getElementById('welcome-dots').innerHTML = WELCOME.map((_, k) => '<span class="' + (k === welcomeStep ? 'on' : '') + '"></span>').join('');
+  const act = document.getElementById('welcome-actions'); act.innerHTML = '';
+  if(welcomeStep < WELCOME.length - 1){
+    act.appendChild(mkBtn('ቀጥል ▸ (Next)', () => { welcomeStep++; renderWelcome(); }, 'btn-run'));
+    act.appendChild(mkBtn('ዝለል (Skip)', () => endWelcome(false)));
+  } else {
+    act.appendChild(mkBtn('ከቆጣሪ ምሳሌ ጀምር (Start with the counter)', () => endWelcome(true), 'btn-run'));
+    act.appendChild(mkBtn('ባዶ ጀምር (Start blank)', () => endWelcome(false)));
+  }
+  act.querySelectorAll('button').forEach(b => { b.style.margin = '4px'; b.style.padding = '10px 14px'; });
+}
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; document.getElementById('install-btn').style.display = ''; });
+window.addEventListener('appinstalled', () => { deferredInstall = null; document.getElementById('install-btn').style.display = 'none'; });
+function installApp(){ if(!deferredInstall) return; deferredInstall.prompt(); deferredInstall = null; document.getElementById('install-btn').style.display = 'none'; }
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+
 // set up editors, then run once so the preview isn't blank
 window.addEventListener('DOMContentLoaded', () => {
   applyStoredTheme();
   initEditors();
-  const restored = tryRestoreAutosave();
-  if(!restored) loadStarterExample();
+  const idx0 = projIndex(), act0 = activeId();
+  let restored = false;
+  if(idx0.length && act0 && lsGet('direnya-proj:'+act0,null)){ loadState(lsGet('direnya-proj:'+act0)); restored = true; }
+  else { restored = tryRestoreAutosave(); if(!restored) loadStarterExample(); }
   wireAutosaveListeners();
-  runProgram();
+  wireAutocomplete();
+  wireSquiggles();
+  buildCodeBar('html');
+  wireUndoButtons(); resetUndoHistory();
+  loadPersistedAssets().then(()=>openFromHash()).then(function(){ if(!VIEWER_MODE){ saveActiveProject(); runProgram(); } });
   if(restored) showToast('✓ ካለፈው ክፍለ ጊዜ ተመልሷል (auto-saved)');
+  let seen = null; try{ seen = localStorage.getItem('direnya-onboarded'); }catch(e){}
+  if(!seen){ if(restored || location.hash){ try{ localStorage.setItem('direnya-onboarded','1'); }catch(e){} } else showWelcome(); }
 });
 </script>
 </body>
